@@ -1,0 +1,9 @@
+name = "rpl-admin"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "rpl-admin"
+database_id = "29a6f5d7-aca0-4752-8683-2ba822cdedd5"

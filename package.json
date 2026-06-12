@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --mode client && vite build",
-    "preview": "wrangler dev",
-    "deploy": "$npm_execpath run build && wrangler deploy",
+    "preview": "wrangler pages dev",
+    "deploy": "$npm_execpath run build && wrangler pages deploy",
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
