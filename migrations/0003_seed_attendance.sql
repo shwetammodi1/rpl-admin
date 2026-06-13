@@ -1,0 +1,31 @@
+-- Seed attendance data for June 2026 (demo data for Shwetam Modi / master account,
+-- falls back to whichever master account exists locally).
+
+INSERT OR REPLACE INTO attendance (id, user_id, date, status, in_time, out_time, source)
+VALUES
+  ('seed-att-2026-06-01', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-01', 'absent', NULL, NULL, 'manual'),
+  ('seed-att-2026-06-02', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-02', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-03', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-03', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-04', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-04', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-05', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-05', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-06', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-06', 'absent', NULL, NULL, 'manual'),
+  ('seed-att-2026-06-08', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-08', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-09', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-09', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-10', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-10', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-11', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-11', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-12', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-12', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-13', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-13', 'absent', NULL, NULL, 'manual'),
+  ('seed-att-2026-06-15', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-15', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-16', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-16', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-17', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-17', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-18', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-18', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-19', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-19', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-20', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-20', 'absent', NULL, NULL, 'manual'),
+  ('seed-att-2026-06-22', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-22', 'present', '09:30', '17:30', 'manual'),
+  ('seed-att-2026-06-23', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-23', 'leave', NULL, NULL, 'manual'),
+  ('seed-att-2026-06-24', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-24', 'leave', NULL, NULL, 'manual'),
+  ('seed-att-2026-06-25', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-25', 'half', '09:30', '13:00', 'manual'),
+  ('seed-att-2026-06-26', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-26', 'short', '09:30', '15:00', 'manual'),
+  ('seed-att-2026-06-27', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-27', 'absent', NULL, NULL, 'manual'),
+  ('seed-att-2026-06-29', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-29', 'absent', NULL, NULL, 'manual'),
+  ('seed-att-2026-06-30', COALESCE((SELECT id FROM users WHERE email = 'shwetammodi@gmail.com'), (SELECT id FROM users WHERE role = 'master' LIMIT 1)), '2026-06-30', 'absent', NULL, NULL, 'manual');
