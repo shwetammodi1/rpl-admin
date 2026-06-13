@@ -1,6 +1,6 @@
-import { createRoute } from '../../lib/factory'
-import SignOutButton from '../../islands/SignOutButton'
-import AuthGuard from '../../islands/AuthGuard'
+import { createRoute } from '../../../lib/factory'
+import SignOutButton from '../../../islands/SignOutButton'
+import AuthGuard from '../../../islands/AuthGuard'
 
 export default createRoute((c) => {
   return c.render(
@@ -11,13 +11,13 @@ export default createRoute((c) => {
         <SignOutButton />
       </header>
       <main className="welcome-content" style={{ paddingTop: '48px' }}>
-        <h1>Faculty Dashboard</h1>
+        <h1>HR Dashboard</h1>
         <p>
-          Welcome, <strong id="user-name">faculty member</strong>. Attendance and leave tools will appear here.
+          Welcome, <strong id="user-name">HR team</strong>. Staff management and leave approvals will appear here.
         </p>
       </main>
-      <AuthGuard allowedRoles={['faculty']} />
+      <AuthGuard allowedRoles={['hr', 'master']} />
     </>,
-    { title: 'Dashboard - RPL Maheshwari College' }
+    { title: 'HR Dashboard - RPL Maheshwari College' }
   )
 })

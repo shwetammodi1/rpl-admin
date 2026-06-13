@@ -12,7 +12,7 @@ export default function SignUpForm() {
     setError('')
     setLoading(true)
 
-    const res = await fetch('/api/auth/signup', {
+    const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -22,19 +22,20 @@ export default function SignUpForm() {
       }),
     })
 
-    const result = await res.json<{ error?: string }>()
+    const result = await res.json<{ error?: string; token?: string }>()
 
-    if (!res.ok) {
+    if (!res.ok || !result.token) {
       setLoading(false)
       setError(result.error ?? 'Something went wrong')
       return
     }
 
-    window.location.href = '/dashboard'
+    localStorage.setItem('rpl_token', result.token)
+    window.location.href = '/welcome'
   }
 
   return (
-    <form className="auth-form" onSubmit={onSubmit}>
+    <form className="login-form" onSubmit={onSubmit}>
       <label>
         Name
         <input type="text" name="name" autoComplete="name" required />
@@ -48,7 +49,7 @@ export default function SignUpForm() {
         <input type="password" name="password" autoComplete="new-password" minLength={8} required />
       </label>
       {error && <p className="form-error">{error}</p>}
-      <button type="submit" className="btn-primary" disabled={loading}>
+      <button type="submit" className="btn-gold" disabled={loading}>
         {loading ? 'Creating account…' : 'Sign up'}
       </button>
     </form>

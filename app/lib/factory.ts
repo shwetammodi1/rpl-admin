@@ -1,10 +1,10 @@
 import { createFactory } from 'hono/factory'
-import type { SessionUser } from './session'
+import type { AuthPayload } from './types'
 
 export type AppEnv = {
   Bindings: Env
   Variables: {
-    user: SessionUser | null
+    authUser?: AuthPayload | null
   }
 }
 

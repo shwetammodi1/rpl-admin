@@ -1,7 +1,7 @@
 import { createRoute } from '../../../lib/factory'
 import { verifyPassword } from '../../../lib/password'
-import { createSessionToken, SESSION_COOKIE, type Role } from '../../../lib/session'
-import { setCookie } from 'hono/cookie'
+import { createAuthToken } from '../../../lib/jwt'
+import type { Role } from '../../../lib/types'
 
 export const POST = createRoute(async (c) => {
   const body = await c.req.json().catch(() => null)
@@ -13,24 +13,23 @@ export const POST = createRoute(async (c) => {
   }
 
   const row = await c.env.DB.prepare(
-    'SELECT id, email, name, role, password_hash FROM users WHERE email = ?'
+    'SELECT id, name, email, password_hash, role, department FROM users WHERE email = ?'
   )
     .bind(email)
-    .first<{ id: number; email: string; name: string; role: Role; password_hash: string }>()
+    .first<{ id: string; name: string; email: string; password_hash: string; role: Role; department: string | null }>()
 
   if (!row || !(await verifyPassword(password, row.password_hash))) {
     return c.json({ error: 'Invalid email or password' }, 401)
   }
 
-  const user = { sub: row.id, email: row.email, name: row.name, role: row.role }
-  const token = await createSessionToken(user, c.env.JWT_SECRET)
-  setCookie(c, SESSION_COOKIE, token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'Lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7,
-  })
+  const user = {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    role: row.role,
+    department: row.department,
+  }
+  const token = await createAuthToken({ userId: row.id, role: row.role }, c.env.JWT_SECRET)
 
-  return c.json({ user })
+  return c.json({ user, token })
 })

@@ -1,5 +1,5 @@
 import {} from 'hono'
-import type { SessionUser } from './lib/session'
+import type { AuthPayload } from './lib/types'
 
 declare global {
   interface Env {
@@ -15,6 +15,6 @@ declare module 'hono' {
     ): Response
   }
   interface ContextVariableMap {
-    user: SessionUser | null
+    authUser?: AuthPayload | null
   }
 }
