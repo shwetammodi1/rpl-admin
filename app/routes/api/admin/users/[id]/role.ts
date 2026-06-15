@@ -39,6 +39,8 @@ export const PATCH = createRoute(verifyJWT, requireRole('master'), async (c) => 
     .bind(role, department, id)
     .run()
 
+  const now = Math.floor(Date.now() / 1000)
+
   await c.env.DB.prepare(
     'INSERT INTO audit_logs (id, actor_id, action, entity_type, entity_id, meta, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
   )
@@ -49,7 +51,20 @@ export const PATCH = createRoute(verifyJWT, requireRole('master'), async (c) => 
       'user',
       id,
       JSON.stringify({ old_role: target.role, new_role: role, department }),
-      Math.floor(Date.now() / 1000)
+      now
+    )
+    .run()
+
+  const roleLabel = role === 'hr' ? 'HR' : role === 'master' ? 'Master Admin' : 'Faculty'
+  await c.env.DB.prepare(
+    `INSERT INTO notifications (id, user_id, type, title, message, read, created_at)
+     VALUES (?, ?, 'role_granted', 'Access granted', ?, 0, ?)`
+  )
+    .bind(
+      crypto.randomUUID(),
+      id,
+      `Your account has been granted ${roleLabel} access to the portal.`,
+      now
     )
     .run()
 

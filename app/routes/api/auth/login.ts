@@ -5,17 +5,18 @@ import type { Role } from '../../../lib/types'
 
 export const POST = createRoute(async (c) => {
   const body = await c.req.json().catch(() => null)
-  const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : ''
+  const rawIdentifier = body?.emailOrUsername ?? body?.email
+  const identifier = typeof rawIdentifier === 'string' ? rawIdentifier.trim().toLowerCase() : ''
   const password = typeof body?.password === 'string' ? body.password : ''
 
-  if (!email || !password) {
-    return c.json({ error: 'Email and password are required' }, 400)
+  if (!identifier || !password) {
+    return c.json({ error: 'Email or username and password are required' }, 400)
   }
 
   const row = await c.env.DB.prepare(
-    'SELECT id, name, email, password_hash, role, department FROM users WHERE email = ?'
+    'SELECT id, name, email, password_hash, role, department FROM users WHERE email = ? OR LOWER(name) = ?'
   )
-    .bind(email)
+    .bind(identifier, identifier)
     .first<{ id: string; name: string; email: string; password_hash: string; role: Role; department: string | null }>()
 
   if (!row || !(await verifyPassword(password, row.password_hash))) {

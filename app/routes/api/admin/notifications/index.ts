@@ -13,10 +13,11 @@ type Row = {
 export const GET = createRoute(verifyJWT, requireRole('hr', 'master'), async (c) => {
   const auth = c.get('authUser')!
   const limit = Number(c.req.query('limit') ?? '20')
+  const unread = c.req.query('unread') === 'true'
 
   const { results } = await c.env.DB.prepare(
     `SELECT id, type, title, message, read, created_at FROM notifications
-     WHERE user_id = ? ORDER BY created_at DESC LIMIT ?`
+     WHERE user_id = ?${unread ? ' AND read = 0' : ''} ORDER BY created_at DESC LIMIT ?`
   )
     .bind(auth.userId, limit)
     .all<Row>()

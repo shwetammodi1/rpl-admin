@@ -17,6 +17,11 @@ function todayStr() {
 export const GET = createRoute(verifyJWT, requireRole('hr', 'master'), async (c) => {
   const date = c.req.query('date') ?? todayStr()
 
+  // Faculty with no attendance row default to 'absent', or 'off' on Sundays.
+  const [y, m, d] = date.split('-').map(Number)
+  const isSunday = new Date(y, m - 1, d).getDay() === 0
+  const defaultStatus = isSunday ? 'off' : 'absent'
+
   const { results } = await c.env.DB.prepare(
     `SELECT u.id AS user_id, u.name, u.department, a.status, a.in_time
      FROM users u
@@ -31,7 +36,7 @@ export const GET = createRoute(verifyJWT, requireRole('hr', 'master'), async (c)
     userId: row.user_id,
     name: row.name,
     department: row.department,
-    status: row.status ?? 'absent',
+    status: row.status ?? defaultStatus,
     inTime: row.in_time,
   }))
 

@@ -1,23 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
 :root {
-  --maroon: #8a1538;
-  --maroon-dark: #6c0f2b;
-  --maroon-light: #b1123a;
-  --orange: #f66709;
-  --navy: #1e3a8a;
+  --navy: #0c2340;
+  --gold: #c6a14b;
+  /* Legacy aliases kept on-brand so any old selectors resolve to brand colours */
+  --maroon: var(--navy);
+  --maroon-dark: #0a1c33;
+  --maroon-light: #1a3a5c;
+  --orange: var(--gold);
 
-  --text: #5a5560;
-  --text-h: #1a1422;
+  --text: #5c6b82;
+  --text-h: #172033;
   --bg: #fff;
-  --bg-soft: #fbf7f5;
+  --bg-soft: #f3f5f8;
   --border: #ece6e6;
   --code-bg: #f4f3ec;
-  --accent: var(--maroon);
-  --accent-bg: rgba(138, 21, 56, 0.08);
-  --accent-border: rgba(138, 21, 56, 0.35);
+  --accent: var(--navy);
+  --accent-bg: rgba(12, 35, 64, 0.08);
+  --accent-border: rgba(12, 35, 64, 0.35);
 
-  font: 16px/145% 'DM Sans', system-ui, 'Segoe UI', Roboto, sans-serif;
+  font: 16px/145% 'Plus Jakarta Sans', system-ui, 'Segoe UI', Roboto, sans-serif;
   letter-spacing: 0.1px;
   color-scheme: light;
   color: var(--text);
@@ -39,7 +41,7 @@ main {
 h1,
 h2,
 h3 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Fraunces', Georgia, serif;
   font-weight: 700;
   color: var(--text-h);
   margin: 0 0 8px;
@@ -56,7 +58,7 @@ p {
 }
 
 a {
-  color: var(--maroon);
+  color: var(--rpl-navy, #0c2340);
   font-weight: 600;
   text-decoration: none;
 }
