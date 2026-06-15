@@ -2970,3 +2970,94 @@ code {
     width: 100%;
   }
 }
+
+/* ---------------------------------- */
+/* HR Attendance Reports               */
+/* ---------------------------------- */
+
+.btn-gold-outline {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--rpl-gold);
+  background: transparent;
+  color: var(--rpl-navy);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-gold-outline:hover:not(:disabled) {
+  background: rgba(198, 161, 75, 0.12);
+}
+
+.btn-gold-outline:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.report-num {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.report-num.is-present {
+  color: var(--rpl-present);
+}
+
+.report-num.is-leave {
+  color: var(--rpl-pending);
+}
+
+.report-num.is-absent {
+  color: var(--rpl-absent);
+}
+
+.pct-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.pct-pill.is-good {
+  background: rgba(31, 122, 83, 0.12);
+  color: var(--rpl-present);
+}
+
+.pct-pill.is-warn {
+  background: rgba(178, 125, 23, 0.12);
+  color: var(--rpl-pending);
+}
+
+.pct-pill.is-bad {
+  background: rgba(192, 57, 43, 0.12);
+  color: var(--rpl-absent);
+}
+
+.report-foot td {
+  font-weight: 700;
+  color: var(--rpl-navy);
+  border-top: 2px solid #eef0f3;
+  background: var(--rpl-paper);
+}
+
+.report-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--rpl-navy);
+  background: rgba(198, 161, 75, 0.08);
+  border-left: 3px solid var(--rpl-gold);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 0 24px 24px;
+}
