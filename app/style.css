@@ -2441,3 +2441,261 @@ code {
     width: 100%;
   }
 }
+
+/* ---------------------------------- */
+/* HR Dashboard                        */
+/* ---------------------------------- */
+
+.admin-bell {
+  position: relative;
+  cursor: pointer;
+}
+
+.admin-bell-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--rpl-absent);
+  color: #fff;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  border: 2px solid #fff;
+}
+
+.admin-stat-icon.is-slate {
+  background: rgba(88, 106, 133, 0.12);
+  color: var(--rpl-slate);
+}
+
+.admin-stat-value.is-slate {
+  color: var(--rpl-slate);
+}
+
+.admin-stat-suffix {
+  font-size: 15px;
+  font-weight: 600;
+  color: #9aa3af;
+}
+
+.admin-stat-card.is-clickable {
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.15s;
+}
+
+.admin-stat-card.is-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px -24px rgba(12, 35, 64, 0.4);
+}
+
+.hr-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.hr-card-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hr-date-input {
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e5ea;
+  background: var(--rpl-paper);
+  color: var(--rpl-navy);
+}
+
+.hr-date-input:focus {
+  outline: none;
+  border-color: var(--rpl-gold);
+  box-shadow: 0 0 0 3px rgba(198, 161, 75, 0.2);
+  background: #fff;
+}
+
+.hr-refresh-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid #e2e5ea;
+  background: #fff;
+  color: var(--rpl-navy);
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.hr-refresh-btn:hover {
+  background: var(--rpl-paper);
+}
+
+.hr-link-btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--rpl-navy);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.hr-link-btn:hover {
+  color: var(--rpl-gold);
+}
+
+.hr-card-foot {
+  padding: 16px 24px 24px;
+}
+
+.attn-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.attn-pill.is-present {
+  background: rgba(31, 122, 83, 0.12);
+  color: var(--rpl-present);
+}
+
+.attn-pill.is-half {
+  background: rgba(107, 79, 187, 0.12);
+  color: var(--rpl-half);
+}
+
+.attn-pill.is-short {
+  background: rgba(30, 127, 166, 0.12);
+  color: var(--rpl-short);
+}
+
+.attn-pill.is-leave {
+  background: rgba(178, 125, 23, 0.12);
+  color: var(--rpl-pending);
+}
+
+.attn-pill.is-absent {
+  background: rgba(192, 57, 43, 0.12);
+  color: var(--rpl-absent);
+}
+
+.attn-pill.is-off {
+  background: rgba(154, 163, 175, 0.16);
+  color: var(--rpl-off);
+}
+
+.notif-list {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px 4px;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  padding: 12px;
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.notif-item:hover {
+  background: var(--rpl-paper);
+}
+
+.notif-item.is-unread {
+  border-left-color: var(--rpl-gold);
+  background: rgba(198, 161, 75, 0.06);
+}
+
+.notif-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex: 0 0 auto;
+}
+
+.notif-icon.is-gold {
+  background: rgba(198, 161, 75, 0.16);
+}
+
+.notif-icon.is-blue {
+  background: rgba(30, 127, 166, 0.14);
+}
+
+.notif-icon.is-red {
+  background: rgba(192, 57, 43, 0.14);
+}
+
+.notif-icon.is-green {
+  background: rgba(31, 122, 83, 0.14);
+}
+
+.notif-icon.is-navy {
+  background: rgba(12, 35, 64, 0.1);
+}
+
+.notif-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--rpl-navy);
+}
+
+.notif-message {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.notif-time {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: #9aa3af;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .hr-grid {
+    grid-template-columns: 1fr;
+  }
+}
