@@ -1,6 +1,6 @@
 import { createRoute } from '../../lib/factory'
 import SignOutButton from '../../islands/SignOutButton'
-import FacultyDashboard from '../../islands/FacultyDashboard'
+import ApplyLeave from '../../islands/ApplyLeave'
 
 export default createRoute((c) => {
   return c.render(
@@ -12,10 +12,10 @@ export default createRoute((c) => {
         </div>
 
         <nav className="admin-nav">
-          <a href="/dashboard" className="admin-nav-link is-active">
+          <a href="/dashboard" className="admin-nav-link">
             <span className="admin-nav-icon">🏠</span> Dashboard
           </a>
-          <a href="/dashboard/apply" className="admin-nav-link">
+          <a href="/dashboard/apply" className="admin-nav-link is-active">
             <span className="admin-nav-icon">📝</span> Apply for Leave
           </a>
           <a href="/dashboard/applications" className="admin-nav-link">
@@ -42,7 +42,7 @@ export default createRoute((c) => {
       <div className="admin-main">
         <header className="admin-topbar">
           <div className="admin-topbar-heading">
-            <h1>Dashboard</h1>
+            <h1>Apply for Leave</h1>
             <div className="admin-rule" />
           </div>
           <div className="admin-topbar-actions">
@@ -55,10 +55,10 @@ export default createRoute((c) => {
         </header>
 
         <main className="admin-content">
-          <FacultyDashboard />
+          <ApplyLeave />
         </main>
       </div>
     </div>,
-    { title: 'Dashboard - RPL Maheshwari College' }
+    { title: 'Apply for Leave - RPL Maheshwari College' }
   )
 })

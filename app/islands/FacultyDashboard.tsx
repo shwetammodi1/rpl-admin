@@ -378,7 +378,7 @@ export default function FacultyDashboard() {
                   </tbody>
                 </table>
 
-                <a href="/leave/apply" className="btn-gold-block">
+                <a href="/dashboard/apply" className="btn-gold-block">
                   Apply for leave →
                 </a>
               </div>
@@ -411,7 +411,7 @@ export default function FacultyDashboard() {
                     </span>
                   </div>
                 ))}
-                <a href="/leave/my" className="view-all-link">
+                <a href="/dashboard/applications" className="view-all-link">
                   View all →
                 </a>
               </div>
