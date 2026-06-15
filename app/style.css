@@ -2277,3 +2277,167 @@ code {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------------------------------- */
+/* My Applications                     */
+/* ---------------------------------- */
+
+.status-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.status-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid #e2e5ea;
+  background: #fff;
+  color: var(--rpl-slate);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.status-filter-btn:hover {
+  border-color: var(--rpl-gold);
+}
+
+.status-filter-btn.is-active {
+  background: var(--rpl-navy);
+  border-color: var(--rpl-navy);
+  color: #fff;
+}
+
+.status-filter-count {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--rpl-paper);
+  color: var(--rpl-navy);
+}
+
+.status-filter-btn.is-active .status-filter-count {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.app-status-pill.is-cancelled {
+  background: rgba(154, 163, 175, 0.16);
+  color: var(--rpl-off);
+}
+
+.app-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 24px 24px;
+}
+
+.app-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid #eef0f3;
+  background: #fff;
+}
+
+.app-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.app-card-cl {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rpl-gold);
+}
+
+.app-card-reason {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--rpl-navy);
+  margin: 0;
+}
+
+.app-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.app-meta-label {
+  font-weight: 600;
+  color: var(--rpl-slate);
+}
+
+.app-review {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--rpl-navy);
+  background: rgba(31, 122, 83, 0.08);
+  border-left: 3px solid var(--rpl-present);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.app-review.is-rejected {
+  background: rgba(192, 57, 43, 0.08);
+  border-left-color: var(--rpl-absent);
+}
+
+.app-review strong {
+  font-weight: 700;
+}
+
+.app-card-foot {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-cancel {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--rpl-absent);
+  background: transparent;
+  color: var(--rpl-absent);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-cancel:hover {
+  background: rgba(192, 57, 43, 0.08);
+}
+
+.btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .app-list {
+    padding: 16px;
+  }
+
+  .status-filter {
+    width: 100%;
+  }
+}
