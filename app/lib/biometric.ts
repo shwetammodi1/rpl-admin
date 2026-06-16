@@ -17,6 +17,33 @@ function istParts(punchMs: number): { date: string; time: string } {
   }
 }
 
+// Vendor push auth: HTTP Basic against the configured push credentials.
+// Used when the biometric provider posts to our webhook with a username/password.
+export function checkBasicAuth(env: Env, authHeader: string | undefined): boolean {
+  const user = env.BIOMETRIC_PUSH_USER
+  const pass = env.BIOMETRIC_PUSH_PASS
+  if (!user || !pass || !authHeader?.startsWith('Basic ')) return false
+  let decoded = ''
+  try {
+    decoded = atob(authHeader.slice(6).trim())
+  } catch {
+    return false
+  }
+  const sep = decoded.indexOf(':')
+  if (sep === -1) return false
+  return decoded.slice(0, sep) === user && decoded.slice(sep + 1) === pass
+}
+
+// Resolve a vendor-supplied device identifier (our id OR the physical serial)
+// to our internal biometric_devices.id. Returns null if the device is unknown.
+export async function resolveDevice(db: D1Database, deviceId: string): Promise<string | null> {
+  if (!deviceId) return null
+  const row = await db.prepare('SELECT id FROM biometric_devices WHERE id = ? OR serial = ?')
+    .bind(deviceId, deviceId)
+    .first<{ id: string }>()
+  return row?.id ?? null
+}
+
 // Verify the device exists and the supplied key matches; refresh last_seen_at.
 export async function authenticateDevice(db: D1Database, deviceId: string, key: string): Promise<boolean> {
   if (!deviceId || !key) return false

@@ -8,6 +8,8 @@ declare global {
     RESEND_FROM?: string
     MSG91_AUTHKEY?: string
     MSG91_SENDER?: string
+    BIOMETRIC_PUSH_USER?: string
+    BIOMETRIC_PUSH_PASS?: string
   }
 }
 
