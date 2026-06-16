@@ -1,5 +1,6 @@
 import { createRoute } from '../../../../../lib/factory'
 import { verifyJWT, requireRole } from '../../../../../lib/jwt'
+import { sendNotification, notifyAsync } from '../../../../../lib/notify'
 import type { Role } from '../../../../../lib/types'
 
 const ASSIGNABLE_ROLES: Role[] = ['faculty', 'hr', 'master']
@@ -73,6 +74,8 @@ export const PATCH = createRoute(verifyJWT, requireRole('master'), async (c) => 
   )
     .bind(id)
     .first()
+
+  notifyAsync(c, sendNotification(c.env, id!, 'email', 'role_granted', { role: roleLabel }))
 
   return c.json({ user })
 })

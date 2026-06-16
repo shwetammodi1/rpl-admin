@@ -4,6 +4,10 @@ import type { AuthPayload } from './lib/types'
 declare global {
   interface Env {
     JWT_SECRET: string
+    RESEND_API_KEY?: string
+    RESEND_FROM?: string
+    MSG91_AUTHKEY?: string
+    MSG91_SENDER?: string
   }
 }
 

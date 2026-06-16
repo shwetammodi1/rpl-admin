@@ -1,5 +1,6 @@
 import { createRoute } from '../../../../../lib/factory'
 import { verifyJWT, requireRole } from '../../../../../lib/jwt'
+import { sendNotification, notifyAsync } from '../../../../../lib/notify'
 
 export const PATCH = createRoute(verifyJWT, requireRole('hr', 'master'), async (c) => {
   const auth = c.get('authUser')!
@@ -36,6 +37,10 @@ export const PATCH = createRoute(verifyJWT, requireRole('hr', 'master'), async (
     .run()
 
   const updated = await c.env.DB.prepare('SELECT * FROM leave_applications WHERE id = ?').bind(id).first()
+
+  const data = { comment: comment ?? '' }
+  notifyAsync(c, sendNotification(c.env, application.user_id, 'email', 'leave_rejected', data))
+  notifyAsync(c, sendNotification(c.env, application.user_id, 'sms', 'leave_rejected', data))
 
   return c.json({ application: updated })
 })

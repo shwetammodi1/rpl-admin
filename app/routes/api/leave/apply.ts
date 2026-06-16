@@ -1,5 +1,6 @@
 import { createRoute } from '../../../lib/factory'
 import { verifyJWT, requireRole } from '../../../lib/jwt'
+import { sendNotification, notifyAsync } from '../../../lib/notify'
 
 type ApplyBody = {
   type?: 'full' | 'half' | 'short'
@@ -143,6 +144,9 @@ export const POST = createRoute(verifyJWT, requireRole('faculty'), async (c) => 
   }
 
   const application = await c.env.DB.prepare('SELECT * FROM leave_applications WHERE id = ?').bind(id).first()
+
+  // Confirmation to the faculty member (non-blocking).
+  notifyAsync(c, sendNotification(c.env, auth.userId, 'email', 'leave_submitted', { type, fromDate: fromDate ?? '' }))
 
   return c.json({ application })
 })
