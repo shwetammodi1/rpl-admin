@@ -1,46 +1,49 @@
 import { createRoute } from '../../../lib/factory'
-import { authenticateDevice, checkBasicAuth, ingestPunch, resolveDevice } from '../../../lib/biometric'
+import {
+  authenticateDevice,
+  captureDebug,
+  checkBasicAuth,
+  ensureDevice,
+  ingestPunch,
+  normalizeDirection,
+  parseIncoming,
+  parsePunchTime,
+  pickDeviceId,
+  pickField,
+  pickRef,
+} from '../../../lib/biometric'
 
-type Body = {
-  deviceId?: string
-  biometricRef?: string
-  punchTime?: number
-  direction?: string
-}
+const TIME_KEYS = ['punchTime', 'PunchTime', 'punch_time', 'LogDate', 'logDate', 'LogDateTime', 'AttDateTime', 'DateTime', 'dateTime', 'EventTime', 'eventTime', 'time', 'datetime']
+const DIR_KEYS = ['direction', 'Direction', 'InOut', 'inout', 'in_out', 'status', 'Status', 'C1', 'io', 'type']
 
 export const POST = createRoute(async (c) => {
   const authHeader = c.req.header('Authorization')
   const deviceKey = c.req.header('X-Device-Key') ?? ''
+  const contentType = c.req.header('Content-Type')
 
-  // Read the body as text first so we can log the exact vendor payload during onboarding.
   const raw = await c.req.text()
-  let body: Body | null = null
-  try {
-    body = raw ? (JSON.parse(raw) as Body) : null
-  } catch {
-    body = null
-  }
+  const body = parseIncoming(raw, contentType)
 
-  const deviceId = typeof body?.deviceId === 'string' ? body.deviceId : ''
+  const reportedDeviceId = pickDeviceId(body)
   const viaBasic = checkBasicAuth(c.env, authHeader)
-  const viaDevice = !viaBasic && (await authenticateDevice(c.env.DB, deviceId, deviceKey))
+  const viaDevice = !viaBasic && (await authenticateDevice(c.env.DB, reportedDeviceId, deviceKey))
+
+  // Always capture the raw payload so the vendor format can be inspected in D1.
+  console.log('[biometric:punch] raw=', raw)
+  await captureDebug(c.env.DB, 'punch', contentType, viaBasic || viaDevice, raw)
 
   if (!viaBasic && !viaDevice) {
     return c.json({ error: 'Invalid device credentials' }, 401)
   }
 
-  // Capture the raw payload so the vendor's exact format can be confirmed on the first push.
-  console.log('[biometric:punch] raw=', raw)
+  const internalDeviceId = viaDevice ? reportedDeviceId : await ensureDevice(c.env.DB, reportedDeviceId)
+  const ref = pickRef(body)
+  const ms = parsePunchTime(pickField(body, TIME_KEYS))
+  const dir = normalizeDirection(pickField(body, DIR_KEYS))
 
-  // Device-key auth already validated the id; for Basic-auth push, resolve by id or serial.
-  const internalDeviceId = viaDevice ? deviceId : await resolveDevice(c.env.DB, deviceId)
-
-  if (!internalDeviceId || !body?.biometricRef || typeof body.punchTime !== 'number') {
-    // Accept the request (so the vendor's test succeeds) but skip storage until the
-    // device is registered and the field mapping is confirmed from the captured payload.
-    return c.json({ ok: true })
+  if (internalDeviceId && ref && ms != null) {
+    await ingestPunch(c.env.DB, internalDeviceId, ref, ms, dir)
   }
 
-  await ingestPunch(c.env.DB, internalDeviceId, body.biometricRef, body.punchTime, body.direction ?? null)
   return c.json({ ok: true })
 })

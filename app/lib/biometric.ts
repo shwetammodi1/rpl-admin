@@ -44,6 +44,111 @@ export async function resolveDevice(db: D1Database, deviceId: string): Promise<s
   return row?.id ?? null
 }
 
+// Resolve the device, auto-registering it (by serial) if it's new, so punches
+// from an authenticated vendor are never dropped just because the device row
+// hasn't been created yet.
+export async function ensureDevice(db: D1Database, deviceId: string): Promise<string> {
+  const existing = await resolveDevice(db, deviceId)
+  if (existing) return existing
+  const id = crypto.randomUUID()
+  const serial = deviceId || id
+  await db.prepare('INSERT OR IGNORE INTO biometric_devices (id, name, serial) VALUES (?, ?, ?)')
+    .bind(id, `Auto-registered ${serial}`, serial)
+    .run()
+  return (await resolveDevice(db, serial)) ?? id
+}
+
+// --- Tolerant payload parsing (vendor formats vary: JSON, form-encoded, mixed keys) ---
+
+const REF_KEYS = ['biometricRef', 'userId', 'UserId', 'userid', 'user_id', 'UserID', 'EmployeeCode', 'employeeCode', 'empCode', 'EmpCode', 'pin', 'PIN', 'Pin', 'enrollId', 'EnrollNumber', 'emp_id', 'EmployeeId']
+const TIME_KEYS = ['punchTime', 'PunchTime', 'punch_time', 'LogDate', 'logDate', 'LogDateTime', 'AttDateTime', 'DateTime', 'dateTime', 'EventTime', 'eventTime', 'time', 'datetime']
+const DIR_KEYS = ['direction', 'Direction', 'InOut', 'inout', 'in_out', 'status', 'Status', 'C1', 'io', 'type']
+const DEVICE_KEYS = ['deviceId', 'DeviceId', 'deviceid', 'serial', 'Serial', 'sn', 'SN', 'DeviceSerialNo', 'deviceSerial', 'SerialNumber', 'serialNumber']
+const ARRAY_KEYS = ['punches', 'data', 'records', 'logs', 'AttendanceLogs', 'attendance', 'Table']
+
+export function parseIncoming(raw: string, contentType: string | undefined): Record<string, unknown> {
+  if (!raw) return {}
+  const ct = (contentType ?? '').toLowerCase()
+  if (ct.includes('x-www-form-urlencoded')) {
+    return Object.fromEntries(new URLSearchParams(raw))
+  }
+  try {
+    return JSON.parse(raw) as Record<string, unknown>
+  } catch {
+    try {
+      return Object.fromEntries(new URLSearchParams(raw))
+    } catch {
+      return {}
+    }
+  }
+}
+
+export function pickField(obj: Record<string, unknown>, keys: string[]): unknown {
+  for (const k of keys) {
+    const v = obj?.[k]
+    if (v !== undefined && v !== null && v !== '') return v
+  }
+  return undefined
+}
+
+export function pickRef(obj: Record<string, unknown>) {
+  const v = pickField(obj, REF_KEYS)
+  return v == null ? '' : String(v)
+}
+
+export function pickDeviceId(obj: Record<string, unknown>) {
+  const v = pickField(obj, DEVICE_KEYS)
+  return v == null ? '' : String(v)
+}
+
+export function pickArray(obj: Record<string, unknown>): Record<string, unknown>[] {
+  for (const k of ARRAY_KEYS) {
+    if (Array.isArray(obj?.[k])) return obj[k] as Record<string, unknown>[]
+  }
+  return []
+}
+
+// Accepts epoch ms, epoch seconds, or 'YYYY-MM-DD HH:MM:SS' (assumed IST).
+export function parsePunchTime(v: unknown): number | null {
+  if (typeof v === 'number') return v < 1e12 ? v * 1000 : v
+  if (typeof v === 'string') {
+    const s = v.trim()
+    if (/^\d+$/.test(s)) {
+      const n = Number(s)
+      return n < 1e12 ? n * 1000 : n
+    }
+    let iso = s.replace(' ', 'T')
+    if (!/[zZ]|[+-]\d\d:?\d\d$/.test(iso)) iso += '+05:30'
+    const t = Date.parse(iso)
+    return Number.isNaN(t) ? null : t
+  }
+  return null
+}
+
+export function normalizeDirection(v: unknown): string | null {
+  if (v == null) return null
+  const s = String(v).toLowerCase()
+  if (s.includes('out') || s === '1' || s === 'o') return 'out'
+  if (s.includes('in') || s === '0' || s === 'i') return 'in'
+  return null
+}
+
+// Best-effort: store the raw payload so the format can be inspected in D1.
+export async function captureDebug(
+  db: D1Database,
+  endpoint: string,
+  contentType: string | undefined,
+  authOk: boolean,
+  raw: string
+) {
+  await db.prepare(
+    'INSERT INTO biometric_debug (id, received_at, endpoint, content_type, auth_ok, raw) VALUES (?, ?, ?, ?, ?, ?)'
+  )
+    .bind(crypto.randomUUID(), Date.now(), endpoint, contentType ?? '', authOk ? 1 : 0, raw.slice(0, 4000))
+    .run()
+    .catch(() => {})
+}
+
 // Verify the device exists and the supplied key matches; refresh last_seen_at.
 export async function authenticateDevice(db: D1Database, deviceId: string, key: string): Promise<boolean> {
   if (!deviceId || !key) return false
