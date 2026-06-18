@@ -3498,6 +3498,54 @@ textarea:focus-visible {
   align-items: center;
 }
 
+/* ---- Attendance overview analytics widget (Phase B) ---- */
+.attn-overview {
+  padding: 20px;
+}
+.attn-overview-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.attn-overview-rate {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.attn-overview-pct {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--rpl-ink);
+  letter-spacing: -0.02em;
+}
+.attn-overview-sub {
+  font-size: 13px;
+  color: var(--rpl-muted);
+}
+.attn-overview-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.attn-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--rpl-navy-50);
+}
+.attn-seg {
+  height: 100%;
+  transition: width 300ms ease;
+}
+.attn-seg.is-present { background: var(--rpl-present); }
+.attn-seg.is-leave { background: var(--rpl-pending); }
+.attn-seg.is-absent { background: var(--rpl-absent); }
+
 /* ============================================================= */
 /* DESIGN SYSTEM v2 — Dashboards (Phase 4)                       */
 /* Information hierarchy for HR + Faculty dashboards. CSS only.  */

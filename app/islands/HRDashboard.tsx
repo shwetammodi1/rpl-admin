@@ -230,6 +230,27 @@ export default function HRDashboard() {
         </a>
       </section>
 
+      {!attnLoading && total > 0 && (
+        <section className="admin-card attn-overview">
+          <div className="attn-overview-head">
+            <div className="attn-overview-rate">
+              <span className="attn-overview-pct">{Math.round((presentCount / total) * 100)}%</span>
+              <span className="attn-overview-sub">present · {presentCount} of {total} faculty</span>
+            </div>
+            <div className="attn-overview-legend">
+              <span className="legend-item"><span className="legend-dot is-present" /> Present {presentCount}</span>
+              <span className="legend-item"><span className="legend-dot is-leave" /> Leave {leaveCount}</span>
+              <span className="legend-item"><span className="legend-dot is-absent" /> Absent {absentCount}</span>
+            </div>
+          </div>
+          <div className="attn-bar">
+            <span className="attn-seg is-present" style={{ width: `${(presentCount / total) * 100}%` }} />
+            <span className="attn-seg is-leave" style={{ width: `${(leaveCount / total) * 100}%` }} />
+            <span className="attn-seg is-absent" style={{ width: `${(absentCount / total) * 100}%` }} />
+          </div>
+        </section>
+      )}
+
       <div className="hr-grid">
         {/* LEFT — Today's attendance */}
         <section className="admin-card">
