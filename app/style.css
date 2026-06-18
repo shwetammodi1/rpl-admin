@@ -3830,3 +3830,110 @@ textarea:focus-visible {
 .view-all-link {
   color: var(--rpl-gold);
 }
+
+/* ============================================================= */
+/* DESIGN SYSTEM v2 — Responsive + motion (Phase E)             */
+/* Last layer: wins the cascade over earlier media queries.      */
+/* ============================================================= */
+
+/* Tablet: collapse the shell to a top app strip */
+@media (max-width: 900px) {
+  .admin-layout {
+    grid-template-columns: 1fr;
+  }
+  .admin-sidebar {
+    position: relative;
+    width: auto;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    overflow-x: auto;
+  }
+  .admin-sidebar-brand {
+    margin-bottom: 0;
+    flex: 0 0 auto;
+  }
+  .brand-sub {
+    display: none;
+  }
+  .admin-nav {
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+  }
+  .admin-nav-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+  .admin-nav-section {
+    display: none;
+  }
+  .admin-nav-link {
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border-left: none;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .admin-nav-link.is-active {
+    border-left: none;
+    background: var(--rpl-gold);
+    color: #fff;
+  }
+  .admin-sidebar-footer {
+    display: none;
+  }
+}
+
+/* Phone: tighten chrome and stack the page header + toolbars */
+@media (max-width: 640px) {
+  .admin-content {
+    padding: 16px;
+    gap: 16px;
+  }
+  .admin-topbar {
+    padding: 0 16px;
+  }
+  .admin-card-header {
+    padding: 16px 16px 0;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .page-header-actions {
+    padding-top: 0;
+  }
+  .page-title {
+    font-size: 22px;
+  }
+  .hr-card-tools {
+    width: 100%;
+  }
+  .data-search,
+  .data-search-input {
+    width: 100%;
+    min-width: 0;
+  }
+  .attn-overview-head {
+    align-items: flex-start;
+  }
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
