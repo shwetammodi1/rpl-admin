@@ -18,6 +18,16 @@ type Notification = {
   read: boolean
 }
 
+type Device = {
+  id: string
+  name: string
+  location: string | null
+  serial: string | null
+  lastSeenAt: number | null
+}
+
+const DEVICE_ONLINE_MS = 10 * 60 * 1000
+
 const ROLE_REDIRECTS: Record<string, string> = {
   pending: '/welcome',
   faculty: '/dashboard',
@@ -82,6 +92,7 @@ export default function HRDashboard() {
   const [attendance, setAttendance] = useState<AttendanceRow[]>([])
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [pendingCount, setPendingCount] = useState(0)
+  const [devices, setDevices] = useState<Device[]>([])
   const [attnLoading, setAttnLoading] = useState(true)
   const [notifLoading, setNotifLoading] = useState(true)
 
@@ -119,6 +130,14 @@ export default function HRDashboard() {
     }
   }
 
+  const loadDevices = async () => {
+    const res = await fetch('/api/biometric/devices', { headers: authHeaders() })
+    if (res.ok) {
+      const result = await res.json<{ devices: Device[] }>()
+      setDevices(result.devices)
+    }
+  }
+
   useEffect(() => {
     const token = localStorage.getItem('rpl_token')
     if (!token) {
@@ -148,7 +167,7 @@ export default function HRDashboard() {
         if (avatarEl2) avatarEl2.textContent = initials(user.name)
 
         setAuthChecked(true)
-        await Promise.all([loadAttendance(date), loadNotifications(), loadPendingCount()])
+        await Promise.all([loadAttendance(date), loadNotifications(), loadPendingCount(), loadDevices()])
       })
       .catch(() => {
         window.location.href = '/'
@@ -250,6 +269,43 @@ export default function HRDashboard() {
           </div>
         </section>
       )}
+
+      <section className="admin-card bio-widget">
+        <div className="admin-card-header">
+          <div>
+            <h2 className="admin-card-title">Biometric integration</h2>
+            <div className="admin-rule" />
+          </div>
+          <span className="admin-count-pill">
+            {devices.length === 0
+              ? 'Not linked'
+              : `${devices.filter((d) => d.lastSeenAt && Date.now() - d.lastSeenAt < DEVICE_ONLINE_MS).length}/${devices.length} online`}
+          </span>
+        </div>
+        <div className="bio-list">
+          {devices.length === 0 ? (
+            <div className="admin-empty">
+              No biometric devices linked yet — attendance auto-populates once a thumb-impression device is registered.
+            </div>
+          ) : (
+            devices.map((d) => {
+              const online = !!d.lastSeenAt && Date.now() - d.lastSeenAt < DEVICE_ONLINE_MS
+              return (
+                <div className="bio-row" key={d.id}>
+                  <span className={`bio-status ${online ? 'is-online' : 'is-offline'}`} />
+                  <div className="bio-row-main">
+                    <span className="bio-name">{d.name}</span>
+                    <span className="bio-meta">{d.location ?? d.serial ?? '—'}</span>
+                  </div>
+                  <span className="bio-seen">
+                    {d.lastSeenAt ? relativeTime(Math.floor(d.lastSeenAt / 1000)) : 'never'}
+                  </span>
+                </div>
+              )
+            })
+          )}
+        </div>
+      </section>
 
       <div className="hr-grid">
         {/* LEFT — Today's attendance */}

@@ -9,7 +9,7 @@ type Row = {
   last_seen_at: number | null
 }
 
-export const GET = createRoute(verifyJWT, requireRole('master'), async (c) => {
+export const GET = createRoute(verifyJWT, requireRole('hr', 'master'), async (c) => {
   const { results } = await c.env.DB.prepare(
     'SELECT id, name, location, serial, last_seen_at FROM biometric_devices ORDER BY name'
   ).all<Row>()

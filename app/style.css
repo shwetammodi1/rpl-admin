@@ -3546,6 +3546,60 @@ textarea:focus-visible {
 .attn-seg.is-leave { background: var(--rpl-pending); }
 .attn-seg.is-absent { background: var(--rpl-absent); }
 
+/* ---- Biometric integration widget (Phase B) ---- */
+.bio-list {
+  padding: 12px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bio-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  transition: background 120ms ease;
+}
+.bio-row:hover {
+  background: var(--rpl-navy-50);
+}
+.bio-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.bio-status.is-online {
+  background: var(--rpl-present);
+  box-shadow: 0 0 0 3px rgba(31, 122, 83, 0.15);
+}
+.bio-status.is-offline {
+  background: var(--rpl-off);
+}
+.bio-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+.bio-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--rpl-ink);
+}
+.bio-meta {
+  font-size: 12px;
+  color: var(--rpl-muted);
+}
+.bio-seen {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--rpl-muted);
+  white-space: nowrap;
+}
+
 /* ============================================================= */
 /* DESIGN SYSTEM v2 — Dashboards (Phase 4)                       */
 /* Information hierarchy for HR + Faculty dashboards. CSS only.  */
