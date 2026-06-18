@@ -3405,3 +3405,150 @@ textarea:focus-visible {
   box-shadow: var(--rpl-focus);
   border-radius: var(--r-sm);
 }
+
+/* ============================================================= */
+/* DESIGN SYSTEM v2 — Dashboards (Phase 4)                       */
+/* Information hierarchy for HR + Faculty dashboards. CSS only.  */
+/* ============================================================= */
+
+/* ---- KPI row: tighter internal hierarchy ---- */
+.admin-stats {
+  gap: 16px;
+}
+.admin-stat-card {
+  gap: 14px;
+}
+.admin-stat-value {
+  letter-spacing: -0.01em;
+}
+.admin-stat-suffix {
+  font-size: 14px;
+  color: var(--rpl-muted);
+}
+
+/* ---- Two-column dashboard grids ---- */
+.faculty-grid,
+.hr-grid {
+  gap: 20px;
+}
+
+/* ---- Card header rhythm (works now that card padding is 0) ---- */
+.admin-card-header {
+  padding: 18px 20px 0;
+}
+.admin-card-title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ---- Attendance register: the signature element ---- */
+.register-grid {
+  padding: 16px 20px 20px;
+  gap: 6px;
+}
+.register-head {
+  color: var(--rpl-muted);
+  background: var(--rpl-navy-50);
+  border-bottom: 1px solid var(--rpl-gold);
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.register-cell {
+  min-height: 54px;
+  border: 1px solid var(--rpl-border);
+  border-radius: var(--r-md);
+  background: #fff;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.register-cell:hover {
+  border-color: #cbd5e1;
+}
+.register-cell.is-empty {
+  border-color: transparent;
+  background: transparent;
+}
+.register-cell.is-today {
+  border: 1.5px solid var(--rpl-gold);
+  box-shadow: var(--rpl-focus);
+}
+.register-cell.is-off {
+  background: var(--rpl-navy-50);
+}
+.register-date {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--rpl-ink);
+}
+.register-cell.is-off .register-date {
+  color: var(--rpl-off);
+}
+.register-tag {
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.register-legend {
+  padding: 0 20px 20px;
+  gap: 16px;
+}
+.legend-item {
+  font-size: 11px;
+  color: var(--rpl-muted);
+}
+
+/* ---- CL balance card ---- */
+.cl-donut-value {
+  color: var(--rpl-ink);
+  letter-spacing: -0.01em;
+}
+.cl-donut-label {
+  color: var(--rpl-muted);
+}
+.cl-ledger td {
+  color: var(--rpl-ink);
+}
+.cl-ledger tr.cl-available td {
+  color: var(--rpl-gold);
+}
+
+/* ---- Notifications → activity feed ---- */
+.notif-list {
+  padding: 8px 12px 4px;
+}
+.notif-item {
+  border-radius: var(--r-md);
+  padding: 12px;
+  transition: background 120ms ease;
+}
+.notif-item.is-unread {
+  background: var(--rpl-gold-50);
+  border-left: 2px solid var(--rpl-gold);
+}
+.notif-title {
+  font-weight: 600;
+  color: var(--rpl-ink);
+}
+.notif-message {
+  color: var(--rpl-muted);
+}
+.notif-time {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  color: var(--rpl-muted);
+}
+.notif-icon {
+  border-radius: var(--r-md);
+}
+
+/* ---- Latest applications mini-list ---- */
+.application-item {
+  border-radius: var(--r-md);
+  border: 1px solid var(--rpl-border);
+  background: #fff;
+}
+.application-dates {
+  color: var(--rpl-muted);
+}
+.view-all-link {
+  color: var(--rpl-gold);
+}
