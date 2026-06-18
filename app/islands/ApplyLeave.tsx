@@ -265,7 +265,7 @@ export default function ApplyLeave() {
           <form className="apply-form-card" onSubmit={handleSubmit}>
             {/* STEP 1 — Leave type */}
             <div>
-              <p className="form-step-label">Step 1 — Leave type</p>
+              <p className="form-step-label">Leave type</p>
               <div className="leave-type-cards">
                 <button
                   type="button"
@@ -300,7 +300,7 @@ export default function ApplyLeave() {
 
             {/* STEP 2 — Date / time */}
             <div>
-              <p className="form-step-label">Step 2 — When</p>
+              <p className="form-step-label">When</p>
 
               {type === 'full' && (
                 <div className="form-fields">
@@ -397,7 +397,7 @@ export default function ApplyLeave() {
 
             {/* STEP 3 — Reason */}
             <div>
-              <p className="form-step-label">Step 3 — Reason</p>
+              <p className="form-step-label">Reason</p>
               <div className="form-fields">
                 <label className="form-field is-full">
                   <textarea
@@ -411,7 +411,7 @@ export default function ApplyLeave() {
 
             {/* STEP 4 — Substitute */}
             <div>
-              <p className="form-step-label">Step 4 — Substitute</p>
+              <p className="form-step-label">Substitute</p>
               <div className="form-fields">
                 <label className="form-field is-full">
                   <select

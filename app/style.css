@@ -3546,6 +3546,57 @@ textarea:focus-visible {
 .attn-seg.is-leave { background: var(--rpl-pending); }
 .attn-seg.is-absent { background: var(--rpl-absent); }
 
+/* ============================================================= */
+/* DESIGN SYSTEM v2 — Module flows (Phase D)                     */
+/* ============================================================= */
+
+/* Apply Leave: guided, numbered form sections */
+.apply-form-card {
+  counter-reset: step;
+}
+.form-step-label {
+  counter-increment: step;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--rpl-ink);
+  margin: 0 0 14px;
+}
+.form-step-label::before {
+  content: counter(step);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--rpl-navy);
+  color: #fff;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+
+/* Leave Requests: tighter review queue */
+.req-card {
+  transition: box-shadow 150ms ease, border-color 150ms ease;
+}
+.req-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: #cbd5e1;
+}
+.req-meta-label {
+  letter-spacing: 0.06em;
+}
+.admin-count-pill.is-amber {
+  font-weight: 600;
+}
+
 /* ---- Reusable data-table filter primitives (Phase C) ---- */
 .data-search {
   position: relative;
