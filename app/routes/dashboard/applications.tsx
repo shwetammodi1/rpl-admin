@@ -1,65 +1,25 @@
 import { createRoute } from '../../lib/factory'
-import SignOutButton from '../../islands/SignOutButton'
+import Sidebar from '../../components/Sidebar'
+import Topbar from '../../components/Topbar'
+import PageHeader from '../../components/PageHeader'
 import MyApplications from '../../islands/MyApplications'
-import Icon from '../../components/Icon'
 
-export default createRoute((c) => {
-  return c.render(
+export default createRoute((c) =>
+  c.render(
     <div className="admin-layout">
-      <aside className="admin-sidebar">
-        <div className="admin-sidebar-brand">
-          <div className="login-crest">RPL</div>
-          <span>RPL Maheshwari</span>
-        </div>
-
-        <nav className="admin-nav">
-          <a href="/dashboard" className="admin-nav-link">
-            <span className="admin-nav-icon"><Icon name="home" size={16} /></span> Dashboard
-          </a>
-          <a href="/dashboard/apply" className="admin-nav-link">
-            <span className="admin-nav-icon"><Icon name="calendar-plus" size={16} /></span> Apply for Leave
-          </a>
-          <a href="/dashboard/applications" className="admin-nav-link is-active">
-            <span className="admin-nav-icon"><Icon name="list" size={16} /></span> My Applications
-          </a>
-        </nav>
-
-        <div className="admin-sidebar-footer">
-          <div className="admin-sidebar-user">
-            <div className="admin-sidebar-avatar" id="admin-avatar">
-              F
-            </div>
-            <div>
-              <div className="admin-sidebar-name" id="admin-name">
-                Faculty Member
-              </div>
-              <span className="admin-sidebar-role">Faculty</span>
-            </div>
-          </div>
-          <SignOutButton />
-        </div>
-      </aside>
-
+      <Sidebar role="faculty" active="applications" />
       <div className="admin-main">
-        <header className="admin-topbar">
-          <div className="admin-topbar-heading">
-            <h1>My Applications</h1>
-            <div className="admin-rule" />
-          </div>
-          <div className="admin-topbar-actions">
-            <div className="admin-search-icon"><Icon name="search" /></div>
-            <div className="admin-bell"><Icon name="bell" /></div>
-            <div className="admin-topbar-avatar" id="admin-avatar-2">
-              F
-            </div>
-          </div>
-        </header>
-
+        <Topbar role="faculty" />
         <main className="admin-content">
+          <PageHeader title="My Applications" subtitle="Track the status of every request">
+            <a href="/dashboard/apply" className="btn-gold">
+              Apply for Leave →
+            </a>
+          </PageHeader>
           <MyApplications />
         </main>
       </div>
     </div>,
     { title: 'My Applications - RPL Maheshwari College' }
   )
-})
+)

@@ -1,67 +1,21 @@
 import { createRoute } from '../../../lib/factory'
-import SignOutButton from '../../../islands/SignOutButton'
+import Sidebar from '../../../components/Sidebar'
+import Topbar from '../../../components/Topbar'
+import PageHeader from '../../../components/PageHeader'
 import HRDashboard from '../../../islands/HRDashboard'
-import Icon from '../../../components/Icon'
 
-export default createRoute((c) => {
-  return c.render(
+export default createRoute((c) =>
+  c.render(
     <div className="admin-layout">
-      <aside className="admin-sidebar">
-        <div className="admin-sidebar-brand">
-          <div className="login-crest">RPL</div>
-          <span>RPL Maheshwari</span>
-        </div>
-
-        <nav className="admin-nav">
-          <a href="/hr/dashboard" className="admin-nav-link is-active">
-            <span className="admin-nav-icon"><Icon name="layout-grid" size={16} /></span> Dashboard
-          </a>
-          <a href="/hr/requests" className="admin-nav-link">
-            <span className="admin-nav-icon"><Icon name="check-square" size={16} /></span> Leave Requests
-          </a>
-          <a href="/hr/attendance" className="admin-nav-link">
-            <span className="admin-nav-icon"><Icon name="bar-chart" size={16} /></span> Attendance Reports
-          </a>
-        </nav>
-
-        <div className="admin-sidebar-footer">
-          <div className="admin-sidebar-user">
-            <div className="admin-sidebar-avatar" id="admin-avatar">
-              H
-            </div>
-            <div>
-              <div className="admin-sidebar-name" id="admin-name">
-                HR Team
-              </div>
-              <span className="admin-sidebar-role">HR Admin</span>
-            </div>
-          </div>
-          <SignOutButton />
-        </div>
-      </aside>
-
+      <Sidebar role="hr" active="dashboard" />
       <div className="admin-main">
-        <header className="admin-topbar">
-          <div className="admin-topbar-heading">
-            <h1>HR Dashboard</h1>
-            <div className="admin-rule" />
-          </div>
-          <div className="admin-topbar-actions">
-            <div className="admin-bell" id="hr-bell">
-              <Icon name="bell" />
-              <span className="admin-bell-badge" id="hr-bell-badge" style={{ display: 'none' }} />
-            </div>
-            <div className="admin-topbar-avatar" id="admin-avatar-2">
-              H
-            </div>
-          </div>
-        </header>
-
+        <Topbar role="hr" />
         <main className="admin-content">
+          <PageHeader title="HR Dashboard" subtitle="Live attendance across all faculty" />
           <HRDashboard />
         </main>
       </div>
     </div>,
     { title: 'HR Dashboard - RPL Maheshwari College' }
   )
-})
+)

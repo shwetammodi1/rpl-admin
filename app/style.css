@@ -3407,6 +3407,98 @@ textarea:focus-visible {
 }
 
 /* ============================================================= */
+/* DESIGN SYSTEM v2 — App architecture (Phase A)                 */
+/* Shared shell: brand, grouped nav, slim app bar, page header.  */
+/* ============================================================= */
+
+/* Brand block */
+.admin-sidebar-brand {
+  margin-bottom: 24px;
+}
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.brand-name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+.brand-sub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 1px;
+}
+
+/* Grouped, labeled navigation */
+.admin-nav {
+  gap: 0;
+}
+.admin-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+.admin-nav-section {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+  padding: 0 12px;
+  margin: 4px 0 6px;
+}
+
+/* Slim app bar */
+.topbar-context {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--rpl-muted);
+}
+
+/* Page header (title + rule + subtitle + actions) */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.page-header-text {
+  min-width: 0;
+}
+.page-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  font-size: 26px;
+  color: var(--rpl-navy);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.page-header .admin-rule {
+  margin: 10px 0 0;
+}
+.page-subtitle {
+  font-size: 14px;
+  color: var(--rpl-muted);
+  margin: 10px 0 0;
+}
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+.page-header-actions .btn-gold {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ============================================================= */
 /* DESIGN SYSTEM v2 — Dashboards (Phase 4)                       */
 /* Information hierarchy for HR + Faculty dashboards. CSS only.  */
 /* ============================================================= */
