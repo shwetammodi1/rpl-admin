@@ -3546,6 +3546,39 @@ textarea:focus-visible {
 .attn-seg.is-leave { background: var(--rpl-pending); }
 .attn-seg.is-absent { background: var(--rpl-absent); }
 
+/* ---- Reusable data-table filter primitives (Phase C) ---- */
+.data-search {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.data-search > svg {
+  position: absolute;
+  left: 12px;
+  color: var(--rpl-muted);
+  pointer-events: none;
+}
+.data-search-input {
+  height: 40px;
+  padding: 0 14px 0 34px;
+  border: 1px solid var(--rpl-border);
+  border-radius: var(--r-md);
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  color: var(--rpl-ink);
+  min-width: 200px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.data-search-input::placeholder {
+  color: var(--rpl-muted);
+}
+.data-search-input:focus {
+  outline: none;
+  border-color: var(--rpl-gold);
+  box-shadow: var(--rpl-focus);
+}
+
 /* ---- Biometric integration widget (Phase B) ---- */
 .bio-list {
   padding: 12px 20px 20px;

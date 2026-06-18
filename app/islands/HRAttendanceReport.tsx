@@ -56,6 +56,8 @@ export default function HRAttendanceReport() {
   const [month, setMonth] = useState(currentMonth())
   const [report, setReport] = useState<ReportRow[]>([])
   const [exporting, setExporting] = useState(false)
+  const [search, setSearch] = useState('')
+  const [deptFilter, setDeptFilter] = useState('all')
 
   const options = monthOptions()
 
@@ -139,8 +141,15 @@ export default function HRAttendanceReport() {
     return null
   }
 
-  const count = report.length
-  const totals = report.reduce(
+  const departments = Array.from(new Set(report.map((r) => r.department).filter(Boolean))) as string[]
+  const q = search.trim().toLowerCase()
+  const filtered = report.filter((r) => {
+    if (deptFilter !== 'all' && (r.department ?? '') !== deptFilter) return false
+    if (q && !r.name.toLowerCase().includes(q) && !(r.department ?? '').toLowerCase().includes(q)) return false
+    return true
+  })
+  const count = filtered.length
+  const totals = filtered.reduce(
     (acc, r) => ({
       present: acc.present + r.present,
       leave: acc.leave + r.leave,
@@ -161,6 +170,28 @@ export default function HRAttendanceReport() {
           <div className="admin-rule" />
         </div>
         <div className="hr-card-tools">
+          <div className="data-search">
+            <Icon name="search" size={15} />
+            <input
+              type="search"
+              className="data-search-input"
+              placeholder="Search faculty…"
+              value={search}
+              onInput={(e) => setSearch((e.target as HTMLInputElement).value)}
+            />
+          </div>
+          <select
+            className="admin-filter-select"
+            value={deptFilter}
+            onChange={(e) => setDeptFilter((e.target as HTMLSelectElement).value)}
+          >
+            <option value="all">All departments</option>
+            {departments.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
           <select
             className="admin-filter-select"
             value={month}
@@ -212,11 +243,13 @@ export default function HRAttendanceReport() {
             ) : count === 0 ? (
               <tr>
                 <td colSpan={7}>
-                  <div className="admin-empty">No faculty found for this month.</div>
+                  <div className="admin-empty">
+                    {report.length === 0 ? 'No faculty found for this month.' : 'No faculty match your filters.'}
+                  </div>
                 </td>
               </tr>
             ) : (
-              report.map((row) => (
+              filtered.map((row) => (
                 <tr key={row.userId}>
                   <td>
                     <div className="admin-user-cell">
