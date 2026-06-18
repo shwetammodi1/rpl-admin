@@ -1,6 +1,7 @@
 import { createRoute } from '../../../lib/factory'
 import SignOutButton from '../../../islands/SignOutButton'
 import HRDashboard from '../../../islands/HRDashboard'
+import Icon from '../../../components/Icon'
 
 export default createRoute((c) => {
   return c.render(
@@ -13,13 +14,13 @@ export default createRoute((c) => {
 
         <nav className="admin-nav">
           <a href="/hr/dashboard" className="admin-nav-link is-active">
-            <span className="admin-nav-icon">📊</span> Dashboard
+            <span className="admin-nav-icon"><Icon name="layout-grid" size={16} /></span> Dashboard
           </a>
           <a href="/hr/requests" className="admin-nav-link">
-            <span className="admin-nav-icon">✅</span> Leave Requests
+            <span className="admin-nav-icon"><Icon name="check-square" size={16} /></span> Leave Requests
           </a>
           <a href="/hr/attendance" className="admin-nav-link">
-            <span className="admin-nav-icon">📋</span> Attendance Reports
+            <span className="admin-nav-icon"><Icon name="bar-chart" size={16} /></span> Attendance Reports
           </a>
         </nav>
 
@@ -47,7 +48,7 @@ export default createRoute((c) => {
           </div>
           <div className="admin-topbar-actions">
             <div className="admin-bell" id="hr-bell">
-              🔔
+              <Icon name="bell" />
               <span className="admin-bell-badge" id="hr-bell-badge" style={{ display: 'none' }} />
             </div>
             <div className="admin-topbar-avatar" id="admin-avatar-2">

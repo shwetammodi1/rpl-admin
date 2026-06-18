@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'hono/jsx'
+import Icon from '../components/Icon'
 
 type LeaveRequest = {
   id: string
@@ -206,7 +207,7 @@ export default function HRLeaveRequests() {
             ))
           ) : requests.length === 0 ? (
             <div className="req-empty">
-              <div className="req-empty-icon">✓</div>
+              <div className="req-empty-icon"><Icon name="check" size={30} /></div>
               <h3 className="req-empty-title">All caught up!</h3>
               <p className="req-empty-text">No pending leave requests at this time.</p>
             </div>
@@ -216,7 +217,7 @@ export default function HRLeaveRequests() {
               if (done) {
                 return (
                   <div className={`req-resolved is-${done.status}`} key={req.id}>
-                    <span className="req-resolved-icon">{done.status === 'approved' ? '✓' : '✕'}</span>
+                    <span className="req-resolved-icon"><Icon name={done.status === 'approved' ? 'check' : 'x'} size={14} /></span>
                     <span>
                       <strong>{done.status === 'approved' ? 'Approved' : 'Rejected'}</strong> · {done.name} · {done.date}
                     </span>
@@ -280,7 +281,7 @@ export default function HRLeaveRequests() {
                       disabled={busy}
                       onClick={() => handleAction(req, 'approve')}
                     >
-                      ✓ Approve
+                      <Icon name="check" size={14} /> Approve
                     </button>
                     <button
                       type="button"
@@ -288,7 +289,7 @@ export default function HRLeaveRequests() {
                       disabled={busy}
                       onClick={() => handleAction(req, 'reject')}
                     >
-                      ✕ Reject
+                      <Icon name="x" size={14} /> Reject
                     </button>
                   </div>
                 </article>

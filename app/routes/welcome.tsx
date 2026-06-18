@@ -1,6 +1,7 @@
 import { createRoute } from '../lib/factory'
 import SignOutButton from '../islands/SignOutButton'
 import WelcomeGuard from '../islands/WelcomeGuard'
+import Icon from '../components/Icon'
 
 export default createRoute((c) => {
   return c.render(
@@ -12,7 +13,7 @@ export default createRoute((c) => {
       </header>
 
       <section className="welcome-hero">
-        <span className="welcome-chip">⏳ Account awaiting approval</span>
+        <span className="welcome-chip"><Icon name="clock" size={14} /> Account awaiting approval</span>
         <h1>
           Welcome to RPL Maheshwari, <span id="welcome-firstname" className="gold-text">there</span>.
         </h1>
@@ -24,7 +25,7 @@ export default createRoute((c) => {
 
       <div className="welcome-content">
         <div className="welcome-action-card">
-          <div className="welcome-action-icon">👥</div>
+          <div className="welcome-action-icon"><Icon name="users" size={20} /></div>
           <div>
             <h2>Need access? Contact your administrator</h2>
             <p>

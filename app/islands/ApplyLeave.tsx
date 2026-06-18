@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'hono/jsx'
+import Icon from '../components/Icon'
 
 type LeaveType = 'full' | 'half' | 'short'
 
@@ -271,7 +272,7 @@ export default function ApplyLeave() {
                   className={`leave-type-card ${type === 'full' ? 'is-selected' : ''}`}
                   onClick={() => setType('full')}
                 >
-                  <span className="leave-type-card-icon">📅</span>
+                  <span className="leave-type-card-icon"><Icon name="calendar-plus" size={22} /></span>
                   <span className="leave-type-card-title">Full day</span>
                   <span className="leave-type-card-subtitle">1 CL per day</span>
                 </button>
@@ -280,7 +281,7 @@ export default function ApplyLeave() {
                   className={`leave-type-card ${type === 'half' ? 'is-selected' : ''}`}
                   onClick={() => setType('half')}
                 >
-                  <span className="leave-type-card-icon">◐</span>
+                  <span className="leave-type-card-icon"><Icon name="half-day" size={22} /></span>
                   <span className="leave-type-card-title">Half day</span>
                   <span className="leave-type-card-subtitle">0.5 CL</span>
                 </button>
@@ -289,7 +290,7 @@ export default function ApplyLeave() {
                   className={`leave-type-card ${type === 'short' ? 'is-selected' : ''}`}
                   onClick={() => setType('short')}
                 >
-                  <span className="leave-type-card-icon">⏱️</span>
+                  <span className="leave-type-card-icon"><Icon name="clock" size={22} /></span>
                   <span className="leave-type-card-title">Short leave</span>
                   <span className="leave-type-card-subtitle">Up to 2 hours</span>
                   <span className="leave-type-card-note">0 CL — permission only</span>
@@ -432,7 +433,7 @@ export default function ApplyLeave() {
 
             {/* Balance check */}
             <div className={`balance-callout ${balanceClass}`}>
-              <span>🌴</span>
+              <span><Icon name="umbrella" size={16} /></span>
               <span>
                 You have <strong>{available.toFixed(1)}</strong> casual leaves remaining. This request uses{' '}
                 <strong>{clUnits}</strong> CL,{' '}
@@ -513,7 +514,7 @@ export default function ApplyLeave() {
           </section>
 
           <div className="warning-callout">
-            <span>⚠️</span>
+            <span><Icon name="alert" size={16} /></span>
             <span>
               Same-day leave requests may not be approved. Please apply at least one day in advance.
             </span>

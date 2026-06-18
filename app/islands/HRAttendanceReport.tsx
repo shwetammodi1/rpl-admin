@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'hono/jsx'
+import Icon from '../components/Icon'
 
 type ReportRow = {
   userId: string
@@ -172,7 +173,7 @@ export default function HRAttendanceReport() {
             ))}
           </select>
           <button type="button" className="btn-gold-outline" disabled={exporting || loading} onClick={exportCsv}>
-            ⭳ {exporting ? 'Exporting…' : 'Export CSV'}
+            <Icon name="download" size={14} /> {exporting ? 'Exporting…' : 'Export CSV'}
           </button>
         </div>
       </div>
@@ -261,7 +262,7 @@ export default function HRAttendanceReport() {
       </div>
 
       <div className="report-callout">
-        <span>ℹ️</span>
+        <span><Icon name="info" size={16} /></span>
         <span>
           This report is biometric-ready. Present and In-time figures will auto-populate once thumb-impression
           devices are linked via the attendance API. Manual entry until then.

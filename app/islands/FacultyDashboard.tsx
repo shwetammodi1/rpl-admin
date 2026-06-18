@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'hono/jsx'
+import Icon from '../components/Icon'
 
 type AttendanceRecord = {
   date: string
@@ -194,28 +195,28 @@ export default function FacultyDashboard() {
     <>
       <section className="admin-stats is-four">
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-present">✅</div>
+          <div className="admin-stat-icon is-present"><Icon name="check-circle" size={18} /></div>
           <div>
             <div className="admin-stat-value is-present">{loading ? '–' : presentCount}</div>
             <div className="admin-stat-label">Present ({MONTH_NAMES[month - 1]})</div>
           </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-amber">🌴</div>
+          <div className="admin-stat-icon is-amber"><Icon name="umbrella" size={18} /></div>
           <div>
             <div className="admin-stat-value is-amber">{loading ? '–' : leaveCount}</div>
             <div className="admin-stat-label">On Leave</div>
           </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-blue">⏱️</div>
+          <div className="admin-stat-icon is-blue"><Icon name="clock" size={18} /></div>
           <div>
             <div className="admin-stat-value is-blue">{loading ? '–' : shortCount}</div>
             <div className="admin-stat-label">Short Leave</div>
           </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-absent">❌</div>
+          <div className="admin-stat-icon is-absent"><Icon name="x-circle" size={18} /></div>
           <div>
             <div className="admin-stat-value is-absent">{loading ? '–' : absentCount}</div>
             <div className="admin-stat-label">Absent</div>

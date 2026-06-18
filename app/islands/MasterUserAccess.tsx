@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'hono/jsx'
+import Icon from '../components/Icon'
 
 type User = {
   id: string
@@ -45,7 +46,7 @@ function RolePill({ role }: { role: User['role'] }) {
   if (role === 'pending') {
     return (
       <span className="admin-role-pill is-pending">
-        <span>⏳</span> Awaiting
+        <Icon name="clock" size={12} /> Awaiting
       </span>
     )
   }
@@ -214,21 +215,21 @@ export default function MasterUserAccess() {
     <>
       <section className="admin-stats">
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-navy">👤</div>
+          <div className="admin-stat-icon is-navy"><Icon name="users" size={18} /></div>
           <div>
             <div className="admin-stat-value">{totalAccounts}</div>
             <div className="admin-stat-label">Total Accounts</div>
           </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-amber">⏳</div>
+          <div className="admin-stat-icon is-amber"><Icon name="clock" size={18} /></div>
           <div>
             <div className="admin-stat-value is-amber">{awaitingAccess}</div>
             <div className="admin-stat-label">Awaiting Access</div>
           </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-blue">🛡️</div>
+          <div className="admin-stat-icon is-blue"><Icon name="shield" size={18} /></div>
           <div>
             <div className="admin-stat-value is-blue">{adminsAndHr}</div>
             <div className="admin-stat-label">Admins &amp; HR</div>

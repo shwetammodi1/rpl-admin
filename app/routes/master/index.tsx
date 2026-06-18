@@ -1,6 +1,7 @@
 import { createRoute } from '../../lib/factory'
 import SignOutButton from '../../islands/SignOutButton'
 import MasterUserAccess from '../../islands/MasterUserAccess'
+import Icon from '../../components/Icon'
 
 export default createRoute((c) => {
   return c.render(
@@ -13,13 +14,13 @@ export default createRoute((c) => {
 
         <nav className="admin-nav">
           <a href="/master" className="admin-nav-link is-active">
-            <span className="admin-nav-icon">👥</span> User Access
+            <span className="admin-nav-icon"><Icon name="users" size={16} /></span> User Access
           </a>
-          <a href="#" className="admin-nav-link">
-            <span className="admin-nav-icon">📊</span> Attendance Reports
+          <a href="/hr/attendance" className="admin-nav-link">
+            <span className="admin-nav-icon"><Icon name="bar-chart" size={16} /></span> Attendance Reports
           </a>
-          <a href="#" className="admin-nav-link">
-            <span className="admin-nav-icon">📋</span> Leave Requests
+          <a href="/hr/requests" className="admin-nav-link">
+            <span className="admin-nav-icon"><Icon name="check-square" size={16} /></span> Leave Requests
           </a>
         </nav>
 
@@ -46,7 +47,7 @@ export default createRoute((c) => {
             <div className="admin-rule" />
           </div>
           <div className="admin-topbar-actions">
-            <div className="admin-bell">🔔</div>
+            <div className="admin-bell"><Icon name="bell" /></div>
             <div className="admin-topbar-avatar" id="admin-avatar-2">
               M
             </div>

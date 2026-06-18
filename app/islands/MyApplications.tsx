@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'hono/jsx'
+import Icon from '../components/Icon'
 
 type Application = {
   id: string
@@ -199,28 +200,28 @@ export default function MyApplications() {
     <>
       <section className="admin-stats is-four">
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-blue">📋</div>
+          <div className="admin-stat-icon is-blue"><Icon name="list" size={18} /></div>
           <div>
             <div className="admin-stat-value is-blue">{loading ? '–' : counts.all}</div>
             <div className="admin-stat-label">Total requests</div>
           </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-amber">⏳</div>
+          <div className="admin-stat-icon is-amber"><Icon name="clock" size={18} /></div>
           <div>
             <div className="admin-stat-value is-amber">{loading ? '–' : counts.pending}</div>
             <div className="admin-stat-label">Pending</div>
           </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-present">✅</div>
+          <div className="admin-stat-icon is-present"><Icon name="check-circle" size={18} /></div>
           <div>
             <div className="admin-stat-value is-present">{loading ? '–' : counts.approved}</div>
             <div className="admin-stat-label">Approved</div>
           </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-absent">❌</div>
+          <div className="admin-stat-icon is-absent"><Icon name="x-circle" size={18} /></div>
           <div>
             <div className="admin-stat-value is-absent">{loading ? '–' : counts.rejected}</div>
             <div className="admin-stat-label">Rejected</div>

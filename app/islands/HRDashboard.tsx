@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'hono/jsx'
+import Icon from '../components/Icon'
 
 type AttendanceRow = {
   userId: string
@@ -33,10 +34,10 @@ const STATUS_META: Record<string, { label: string; cls: string }> = {
 }
 
 const NOTIF_META: Record<string, { cls: string; icon: string }> = {
-  leave_request: { cls: 'is-gold', icon: '📝' },
-  short_leave: { cls: 'is-blue', icon: '⏱️' },
-  biometric_alert: { cls: 'is-red', icon: '⚠️' },
-  role_granted: { cls: 'is-green', icon: '✅' },
+  leave_request: { cls: 'is-gold', icon: 'file-text' },
+  short_leave: { cls: 'is-blue', icon: 'clock' },
+  biometric_alert: { cls: 'is-red', icon: 'alert' },
+  role_granted: { cls: 'is-green', icon: 'user-check' },
 }
 
 function initials(name: string) {
@@ -197,7 +198,7 @@ export default function HRDashboard() {
     <>
       <section className="admin-stats is-four">
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-present">✅</div>
+          <div className="admin-stat-icon is-present"><Icon name="check-circle" size={18} /></div>
           <div>
             <div className="admin-stat-value is-present">
               {attnLoading ? '–' : presentCount}
@@ -207,21 +208,21 @@ export default function HRDashboard() {
           </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-amber">🌴</div>
+          <div className="admin-stat-icon is-amber"><Icon name="umbrella" size={18} /></div>
           <div>
             <div className="admin-stat-value is-amber">{attnLoading ? '–' : leaveCount}</div>
             <div className="admin-stat-label">On Leave</div>
           </div>
         </div>
         <div className="admin-stat-card">
-          <div className="admin-stat-icon is-absent">❌</div>
+          <div className="admin-stat-icon is-absent"><Icon name="x-circle" size={18} /></div>
           <div>
             <div className="admin-stat-value is-absent">{attnLoading ? '–' : absentCount}</div>
             <div className="admin-stat-label">Absent</div>
           </div>
         </div>
         <a href="/hr/requests" className="admin-stat-card is-clickable">
-          <div className="admin-stat-icon is-slate">📨</div>
+          <div className="admin-stat-icon is-slate"><Icon name="inbox" size={18} /></div>
           <div>
             <div className="admin-stat-value is-slate">{pendingCount}</div>
             <div className="admin-stat-label">Pending Requests</div>
@@ -251,7 +252,7 @@ export default function HRDashboard() {
                 title="Refresh"
                 onClick={() => loadAttendance(date)}
               >
-                ↻
+                <Icon name="refresh" size={16} />
               </button>
             </div>
           </div>
@@ -343,7 +344,7 @@ export default function HRDashboard() {
               <div className="admin-empty">You're all caught up. No notifications.</div>
             ) : (
               notifications.map((n) => {
-                const meta = NOTIF_META[n.type] ?? { cls: 'is-navy', icon: '🔔' }
+                const meta = NOTIF_META[n.type] ?? { cls: 'is-navy', icon: 'bell' }
                 return (
                   <button
                     type="button"
@@ -351,7 +352,7 @@ export default function HRDashboard() {
                     className={`notif-item ${n.read ? '' : 'is-unread'}`}
                     onClick={() => markRead(n.id)}
                   >
-                    <span className={`notif-icon ${meta.cls}`}>{meta.icon}</span>
+                    <span className={`notif-icon ${meta.cls}`}><Icon name={meta.icon} size={16} /></span>
                     <span className="notif-body">
                       <span className="notif-title">{n.title}</span>
                       {n.message && <span className="notif-message">{n.message}</span>}

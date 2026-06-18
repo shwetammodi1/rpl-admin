@@ -3144,6 +3144,38 @@ code {
   color: #c0392b;
 }
 
+/* ---------------------------------- */
+/* Icon system (Phase 2) — alignment   */
+/* ---------------------------------- */
+
+.admin-nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+.btn-approve,
+.btn-reject,
+.btn-gold-outline,
+.welcome-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.notif-icon.is-gold { color: var(--rpl-gold); }
+.notif-icon.is-blue { color: var(--rpl-hr); }
+.notif-icon.is-red { color: var(--rpl-absent); }
+.notif-icon.is-green { color: var(--rpl-present); }
+.notif-icon.is-navy { color: var(--rpl-navy); }
+.leave-type-card-icon {
+  color: var(--rpl-muted);
+}
+.leave-type-card.is-selected .leave-type-card-icon {
+  color: var(--rpl-gold);
+}
+
 /* ============================================================= */
 /* DESIGN SYSTEM v2 — Premium SaaS foundation (Phase 1)          */
 /* Cascade layer: refines existing classes app-wide. No markup   */
