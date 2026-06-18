@@ -28,6 +28,10 @@
 
 body {
   margin: 0;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  color: #172033;
+  background: #f3f5f8;
 }
 
 main {
@@ -45,6 +49,7 @@ h3 {
   font-weight: 700;
   color: var(--text-h);
   margin: 0 0 8px;
+  letter-spacing: -0.02em;
 }
 
 h1 {
@@ -58,7 +63,7 @@ p {
 }
 
 a {
-  color: var(--rpl-navy, #0c2340);
+  color: #0c2340;
   font-weight: 600;
   text-decoration: none;
 }
@@ -361,6 +366,7 @@ code {
   --rpl-navy: #0c2340;
   --rpl-navy-light: #1a3a5c;
   --rpl-gold: #c6a14b;
+  --rpl-gold-hover: #b8923f;
   --rpl-paper: #f3f5f8;
   --rpl-present: #1f7a53;
   --rpl-absent: #c0392b;
@@ -370,6 +376,25 @@ code {
   --rpl-short: #1e7fa6;
   --rpl-slate: #586a85;
   --rpl-off: #9aa3af;
+
+  /* Premium redesign tokens */
+  --rpl-navy-50: #eef2f7;
+  --rpl-gold-50: #fbf7ee;
+  --rpl-ink: #172033;
+  --rpl-muted: #5c6b82;
+  --rpl-border: #e2e8f0;
+  --rpl-shadow: rgba(12, 35, 64, 0.08);
+  --rpl-shadow-1: 0 1px 3px rgba(12, 35, 64, 0.06), 0 4px 12px rgba(12, 35, 64, 0.04);
+  --rpl-shadow-2: 0 2px 6px rgba(12, 35, 64, 0.08), 0 10px 24px rgba(12, 35, 64, 0.06);
+  --rpl-focus: 0 0 0 3px rgba(198, 161, 75, 0.15);
+
+  /* Pill tints */
+  --tint-present-bg: #e8f5ef;
+  --tint-absent-bg: #fdeaea;
+  --tint-leave-bg: #fdf3e3;
+  --tint-pending-bg: #eef2f7;
+  --tint-half-bg: #efeafc;
+  --tint-short-bg: #e6f1f6;
 }
 
 .login-page {
@@ -594,19 +619,20 @@ code {
 
 .btn-gold {
   font: inherit;
-  font-size: 15px;
-  font-weight: 700;
-  padding: 13px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 16px;
   border-radius: 8px;
   border: none;
-  color: var(--rpl-navy);
-  background: var(--rpl-gold);
+  color: #fff;
+  background: #c6a14b;
   cursor: pointer;
-  transition: background 0.2s, transform 0.05s;
+  transition: all 150ms ease;
 }
 
 .btn-gold:hover {
-  background: #b8924a;
+  background: #b8923f;
+  transform: translateY(-1px);
 }
 
 .btn-gold:active {
@@ -873,7 +899,7 @@ code {
 
 .admin-layout {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 240px 1fr;
   min-height: 100svh;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   background: var(--rpl-paper);
@@ -884,9 +910,10 @@ code {
   top: 0;
   align-self: start;
   height: 100svh;
+  width: 240px;
   display: flex;
   flex-direction: column;
-  background: var(--rpl-navy);
+  background: #0c2340;
   color: #fff;
   padding: 28px 20px;
   box-sizing: border-box;
@@ -921,14 +948,15 @@ code {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 14px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 0;
+  font-size: 13px;
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
-  border-left: 3px solid transparent;
-  transition: background 0.15s, color 0.15s;
+  border-left: 2px solid transparent;
+  transition: all 150ms ease;
 }
 
 .admin-nav-link:hover {
@@ -937,9 +965,9 @@ code {
 }
 
 .admin-nav-link.is-active {
-  color: #fff;
-  background: rgba(198, 161, 75, 0.12);
-  border-left-color: var(--rpl-gold);
+  color: #0c2340;
+  background: #eef2f7;
+  border-left: 2px solid #c6a14b;
 }
 
 .admin-nav-icon {
@@ -1130,8 +1158,10 @@ code {
 
 .admin-card {
   background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 12px 32px -28px rgba(12, 35, 64, 0.25);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(12, 35, 64, 0.06);
+  padding: 24px;
   overflow: hidden;
 }
 
@@ -3062,4 +3092,54 @@ code {
   border-radius: 8px;
   padding: 14px 18px;
   margin: 0 24px 24px;
+}
+
+/* ---------------------------------- */
+/* Tinted status pills (utility)        */
+/* ---------------------------------- */
+
+.pill-present,
+.pill-absent,
+.pill-leave,
+.pill-pending,
+.pill-approved,
+.pill-rejected {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pill-present {
+  background: #e8f5ef;
+  color: #1f7a53;
+}
+
+.pill-absent {
+  background: #fdeaea;
+  color: #c0392b;
+}
+
+.pill-leave {
+  background: #fdf3e3;
+  color: #b27d17;
+}
+
+.pill-pending {
+  background: #eef2f7;
+  color: #586a85;
+}
+
+.pill-approved {
+  background: #e8f5ef;
+  color: #1f7a53;
+}
+
+.pill-rejected {
+  background: #fdeaea;
+  color: #c0392b;
 }
