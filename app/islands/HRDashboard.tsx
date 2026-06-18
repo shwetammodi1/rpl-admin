@@ -93,6 +93,7 @@ export default function HRDashboard() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [pendingCount, setPendingCount] = useState(0)
   const [devices, setDevices] = useState<Device[]>([])
+  const [attnSearch, setAttnSearch] = useState('')
   const [attnLoading, setAttnLoading] = useState(true)
   const [notifLoading, setNotifLoading] = useState(true)
 
@@ -211,7 +212,13 @@ export default function HRDashboard() {
   const presentCount = attendance.filter((a) => ['present', 'half', 'short'].includes(a.status)).length
   const leaveCount = attendance.filter((a) => a.status === 'leave').length
   const absentCount = attendance.filter((a) => a.status === 'absent').length
-  const visibleRows = attendance.slice(0, 10)
+  const attnQuery = attnSearch.trim().toLowerCase()
+  const filteredAttendance = attnQuery
+    ? attendance.filter(
+        (a) => a.name.toLowerCase().includes(attnQuery) || (a.department ?? '').toLowerCase().includes(attnQuery)
+      )
+    : attendance
+  const visibleRows = filteredAttendance.slice(0, 10)
 
   return (
     <>
@@ -316,6 +323,16 @@ export default function HRDashboard() {
               <div className="admin-rule" />
             </div>
             <div className="hr-card-tools">
+              <div className="data-search">
+                <Icon name="search" size={15} />
+                <input
+                  type="search"
+                  className="data-search-input"
+                  placeholder="Search faculty…"
+                  value={attnSearch}
+                  onInput={(e) => setAttnSearch((e.target as HTMLInputElement).value)}
+                />
+              </div>
               <span className="admin-mono">{formatLongDate(date)}</span>
               <input
                 type="date"
@@ -362,7 +379,9 @@ export default function HRDashboard() {
                 ) : visibleRows.length === 0 ? (
                   <tr>
                     <td colSpan={4}>
-                      <div className="admin-empty">No faculty records for this date.</div>
+                      <div className="admin-empty">
+                        {attnQuery ? 'No faculty match your search.' : 'No faculty records for this date.'}
+                      </div>
                     </td>
                   </tr>
                 ) : (
@@ -393,10 +412,10 @@ export default function HRDashboard() {
             </table>
           </div>
 
-          {!attnLoading && attendance.length > 10 && (
+          {!attnLoading && filteredAttendance.length > 10 && (
             <div className="hr-card-foot">
               <a href="/hr/attendance" className="view-all-link">
-                View all {attendance.length} →
+                View all {filteredAttendance.length} →
               </a>
             </div>
           )}

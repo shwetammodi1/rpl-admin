@@ -244,13 +244,16 @@ export default function MasterUserAccess() {
         </div>
 
         <div className="admin-toolbar">
-          <input
-            type="search"
-            className="admin-search-input"
-            placeholder="Search by name or email…"
-            value={search}
-            onInput={(e) => setSearch((e.target as HTMLInputElement).value)}
-          />
+          <div className="data-search">
+            <Icon name="search" size={15} />
+            <input
+              type="search"
+              className="data-search-input"
+              placeholder="Search by name or email…"
+              value={search}
+              onInput={(e) => setSearch((e.target as HTMLInputElement).value)}
+            />
+          </div>
           <select
             className="admin-filter-select"
             value={roleFilter}
