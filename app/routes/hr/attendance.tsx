@@ -2,7 +2,7 @@ import { createRoute } from '../../lib/factory'
 import Sidebar from '../../components/Sidebar'
 import Topbar from '../../components/Topbar'
 import PageHeader from '../../components/PageHeader'
-import HRAttendanceReport from '../../islands/HRAttendanceReport'
+import HRAttendanceCalendar from '../../islands/HRAttendanceCalendar'
 
 export default createRoute((c) =>
   c.render(
@@ -11,11 +11,11 @@ export default createRoute((c) =>
       <div className="admin-main">
         <Topbar role="hr" />
         <main className="admin-content">
-          <PageHeader title="Attendance Reports" subtitle="Consolidated monthly report for all staff" />
-          <HRAttendanceReport />
+          <PageHeader title="Attendance Calendar" subtitle="View daily attendance and mark leave for absent days" />
+          <HRAttendanceCalendar />
         </main>
       </div>
     </div>,
-    { title: 'Attendance Reports - RPL Maheshwari College' }
+    { title: 'Attendance Calendar - RPL Maheshwari College' }
   )
 )

@@ -3937,3 +3937,303 @@ textarea:focus-visible {
     scroll-behavior: auto !important;
   }
 }
+
+/* ============================================================= */
+/* Attendance Calendar (HR)                                      */
+/* ============================================================= */
+
+.legend-dot.is-late { background: var(--rpl-hr); }
+
+.att-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.att-controls .btn-gold,
+.att-side-empty .btn-gold {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.att-summary-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+}
+.att-employee {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.att-employee-select {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rpl-ink);
+  border: 1px solid var(--rpl-border);
+  border-radius: var(--r-md);
+  padding: 8px 12px;
+  background: #fff;
+  min-width: 220px;
+}
+.att-employee-select:focus {
+  outline: none;
+  border-color: var(--rpl-gold);
+  box-shadow: var(--rpl-focus);
+}
+.att-summary {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.att-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 84px;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--rpl-border);
+}
+.att-chip.is-present { background: var(--tint-present-bg); }
+.att-chip.is-absent { background: var(--tint-absent-bg); }
+.att-chip.is-late { background: var(--tint-short-bg); }
+.att-chip.is-leave { background: var(--tint-leave-bg); }
+.att-chip-num {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--rpl-ink);
+}
+.att-chip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--rpl-muted);
+}
+
+.att-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+.att-calendar {
+  padding: 16px 20px 20px;
+}
+.att-cal-head {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.att-cal-weekday {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--rpl-muted);
+  padding: 6px 0;
+}
+.att-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.att-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 74px;
+  padding: 8px;
+  border: 1px solid var(--rpl-border);
+  border-radius: var(--r-md);
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+.att-cell:hover { border-color: #cbd5e1; }
+.att-cell.is-blank { border: none; background: transparent; cursor: default; }
+.att-cell.is-off { background: var(--rpl-navy-50); }
+.att-cell.is-present { background: var(--tint-present-bg); border-color: #cfe9dd; }
+.att-cell.is-late { background: var(--tint-short-bg); border-color: #cfe1ea; }
+.att-cell.is-absent { background: var(--tint-absent-bg); border-color: #f3d2d2; }
+.att-cell.is-leave { background: var(--tint-leave-bg); border-color: #eddcc0; }
+.att-cell.is-today { box-shadow: var(--rpl-focus); }
+.att-cell.is-selected { border-color: var(--rpl-gold); box-shadow: 0 0 0 1.5px var(--rpl-gold); }
+.att-cell-day {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--rpl-ink);
+}
+.att-cell-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.att-cell-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.att-cell.is-present .att-cell-status { color: var(--rpl-present); }
+.att-cell.is-present .att-cell-dot { background: var(--rpl-present); }
+.att-cell.is-late .att-cell-status { color: var(--rpl-hr); }
+.att-cell.is-late .att-cell-dot { background: var(--rpl-hr); }
+.att-cell.is-absent .att-cell-status { color: var(--rpl-absent); }
+.att-cell.is-absent .att-cell-dot { background: var(--rpl-absent); }
+.att-cell.is-leave .att-cell-status { color: var(--rpl-pending); }
+.att-cell.is-leave .att-cell-dot { background: var(--rpl-pending); }
+.att-cell-time {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--rpl-muted);
+}
+.att-cell-off {
+  font-size: 11px;
+  color: var(--rpl-off);
+  font-weight: 600;
+}
+.att-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rpl-border);
+}
+
+.att-side {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.att-side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.att-side-date {
+  font-weight: 600;
+  color: var(--rpl-ink);
+  font-size: 14px;
+}
+.att-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: var(--r-sm);
+  font-size: 11px;
+  font-weight: 600;
+}
+.att-pill.is-present { background: var(--tint-present-bg); color: var(--rpl-present); }
+.att-pill.is-late { background: var(--tint-short-bg); color: var(--rpl-hr); }
+.att-pill.is-absent { background: var(--tint-absent-bg); color: var(--rpl-absent); }
+.att-pill.is-leave { background: var(--tint-leave-bg); color: var(--rpl-pending); }
+.att-pill.is-off { background: var(--rpl-navy-50); color: var(--rpl-off); }
+.att-side-times {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.att-time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  background: var(--rpl-navy-50);
+}
+.att-time-label { font-size: 12px; color: var(--rpl-muted); font-weight: 600; }
+.att-time-val { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-weight: 600; color: var(--rpl-ink); }
+.att-side-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 18px 12px;
+  border: 1px dashed var(--rpl-border);
+  border-radius: var(--r-md);
+}
+.att-side-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--rpl-navy-50);
+  color: var(--rpl-muted);
+}
+.att-side-empty-title { font-weight: 600; color: var(--rpl-ink); font-size: 14px; }
+.att-side-empty-text { font-size: 12px; color: var(--rpl-muted); }
+.att-side-empty .btn-gold { margin-top: 6px; }
+
+.att-recent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid var(--rpl-border);
+  padding-top: 14px;
+}
+.att-recent-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rpl-muted);
+  margin-bottom: 2px;
+}
+.att-recent-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--rpl-border);
+}
+.att-recent-row:last-child { border-bottom: none; }
+.att-recent-dir {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  flex: 0 0 auto;
+}
+.att-recent-dir.is-in { background: var(--tint-present-bg); color: var(--rpl-present); }
+.att-recent-dir.is-out { background: var(--tint-absent-bg); color: var(--rpl-absent); }
+.att-recent-date { font-size: 12px; color: var(--rpl-ink); flex: 1; }
+.att-recent-time { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; color: var(--rpl-muted); }
+.att-recent-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.att-recent-tag.is-in { background: var(--tint-present-bg); color: var(--rpl-present); }
+.att-recent-tag.is-out { background: var(--tint-absent-bg); color: var(--rpl-absent); }
+
+.att-howto { margin: 0; }
+
+@media (max-width: 1024px) {
+  .att-grid { grid-template-columns: 1fr; }
+}
