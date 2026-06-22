@@ -39,6 +39,14 @@ const MONTH_NAMES = [
 
 const WEEKDAY_HEADERS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
+const STATUS_LABELS: Record<string, string> = {
+  present: 'Present',
+  absent: 'Absent',
+  leave: 'On Leave',
+  half: 'Half-day',
+  short: 'Short',
+}
+
 function initials(name: string) {
   const parts = name.trim().split(/\s+/)
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
@@ -260,39 +268,23 @@ export default function FacultyDashboard() {
                   }
 
                   const record = attendanceMap.get(cell.date)
+                  const status = record?.status
                   const isToday = cell.date === todayStr
-                  const isOff = record?.status === 'off'
 
                   return (
                     <div
-                      className={`register-cell ${isToday ? 'is-today' : ''} ${isOff ? 'is-off' : ''}`}
+                      className={`register-cell ${status ? `is-${status}` : ''} ${isToday ? 'is-today' : ''}`}
                       key={cell.date}
                     >
                       <span className="register-date">{cell.day}</span>
-                      {record && record.status === 'present' && (
-                        <span className="register-tag is-present">
-                          <span className="dot" /> P
+                      {status && status !== 'off' && (
+                        <span className={`register-status is-${status}`}>
+                          <span className="register-status-dot" /> {STATUS_LABELS[status] ?? status}
                         </span>
                       )}
-                      {record && record.status === 'absent' && (
-                        <span className="register-tag is-absent">
-                          <span className="dot" /> A
-                        </span>
-                      )}
-                      {record && record.status === 'leave' && (
-                        <span className="register-tag is-leave">
-                          <span className="dot" /> L
-                        </span>
-                      )}
-                      {record && record.status === 'half' && (
-                        <span className="register-tag is-half">
-                          <span className="dot" /> H
-                        </span>
-                      )}
-                      {record && record.status === 'short' && (
-                        <span className="register-tag is-short">
-                          <span className="dot" /> S
-                        </span>
+                      {status === 'off' && <span className="register-off">Week off</span>}
+                      {(status === 'present' || status === 'half' || status === 'short') && record?.inTime && (
+                        <span className="register-intime">{record.inTime}</span>
                       )}
                     </div>
                   )

@@ -4237,3 +4237,45 @@ textarea:focus-visible {
 @media (max-width: 1024px) {
   .att-grid { grid-template-columns: 1fr; }
 }
+
+/* ---- Faculty attendance register — premium colour-coded cells ---- */
+.register-cell.is-present { background: var(--tint-present-bg); border-color: #cfe9dd; }
+.register-cell.is-absent { background: var(--tint-absent-bg); border-color: #f3d2d2; }
+.register-cell.is-leave { background: var(--tint-leave-bg); border-color: #eddcc0; }
+.register-cell.is-half { background: var(--tint-half-bg); border-color: #e0d5f5; }
+.register-cell.is-short { background: var(--tint-short-bg); border-color: #cfe1ea; }
+
+.register-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.register-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.register-status.is-present { color: var(--rpl-present); }
+.register-status.is-present .register-status-dot { background: var(--rpl-present); }
+.register-status.is-absent { color: var(--rpl-absent); }
+.register-status.is-absent .register-status-dot { background: var(--rpl-absent); }
+.register-status.is-leave { color: var(--rpl-pending); }
+.register-status.is-leave .register-status-dot { background: var(--rpl-pending); }
+.register-status.is-half { color: var(--rpl-half); }
+.register-status.is-half .register-status-dot { background: var(--rpl-half); }
+.register-status.is-short { color: var(--rpl-short); }
+.register-status.is-short .register-status-dot { background: var(--rpl-short); }
+
+.register-intime {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--rpl-muted);
+}
+.register-off {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--rpl-off);
+}
