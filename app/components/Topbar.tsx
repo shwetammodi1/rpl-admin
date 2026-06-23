@@ -1,4 +1,5 @@
 import Icon from './Icon'
+import ProfileMenu from '../islands/ProfileMenu'
 
 type Role = 'faculty' | 'hr' | 'master'
 
@@ -22,9 +23,7 @@ export default function Topbar({ role }: { role: Role }) {
           <Icon name="bell" />
           <span className="admin-bell-badge" id="hr-bell-badge" style={{ display: 'none' }} />
         </div>
-        <div className="admin-topbar-avatar" id="admin-avatar-2">
-          {INITIAL[role]}
-        </div>
+        <ProfileMenu role={role} initial={INITIAL[role]} />
       </div>
     </header>
   )
