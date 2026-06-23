@@ -28,9 +28,11 @@ export const POST = createRoute(async (c) => {
   const viaBasic = checkBasicAuth(c.env, authHeader)
   const viaDevice = !viaBasic && (await authenticateDevice(c.env.DB, reportedDeviceId, deviceKey))
 
-  // Always capture the raw payload so the vendor format can be inspected in D1.
-  console.log('[biometric:punch] raw=', raw)
-  await captureDebug(c.env.DB, 'punch', contentType, viaBasic || viaDevice, raw)
+  // Capture the FULL request (method + url + query + headers + body) so the
+  // vendor's exact format — even data sent via query string — is visible in D1.
+  const debugStr = `${c.req.method} ${c.req.url}\nct=${contentType ?? ''} len=${c.req.header('content-length') ?? '0'} ua=${c.req.header('user-agent') ?? ''}\nbody=${raw}`
+  console.log('[biometric:punch]', debugStr)
+  await captureDebug(c.env.DB, 'punch', contentType, viaBasic || viaDevice, debugStr)
 
   if (!viaBasic && !viaDevice) {
     return c.json({ error: 'Invalid device credentials' }, 401)

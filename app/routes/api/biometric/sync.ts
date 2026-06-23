@@ -29,8 +29,9 @@ export const POST = createRoute(async (c) => {
   const viaBasic = checkBasicAuth(c.env, authHeader)
   const viaDevice = !viaBasic && (await authenticateDevice(c.env.DB, reportedDeviceId, deviceKey))
 
-  console.log('[biometric:sync] raw=', raw)
-  await captureDebug(c.env.DB, 'sync', contentType, viaBasic || viaDevice, raw)
+  const debugStr = `${c.req.method} ${c.req.url}\nct=${contentType ?? ''} len=${c.req.header('content-length') ?? '0'} ua=${c.req.header('user-agent') ?? ''}\nbody=${raw}`
+  console.log('[biometric:sync]', debugStr)
+  await captureDebug(c.env.DB, 'sync', contentType, viaBasic || viaDevice, debugStr)
 
   if (!viaBasic && !viaDevice) {
     return c.json({ error: 'Invalid device credentials' }, 401)
