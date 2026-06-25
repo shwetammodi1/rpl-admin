@@ -26,6 +26,7 @@ const NAV: Record<Role, NavGroup[]> = {
       items: [
         { key: 'requests', href: '/hr/requests', label: 'Leave Requests', icon: 'check-square' },
         { key: 'attendance', href: '/hr/attendance', label: 'Attendance Reports', icon: 'bar-chart' },
+        { key: 'import', href: '/hr/import', label: 'Import Attendance', icon: 'download' },
       ],
     },
   ],
@@ -38,6 +39,7 @@ const NAV: Record<Role, NavGroup[]> = {
       label: 'Reports',
       items: [
         { key: 'attendance', href: '/hr/attendance', label: 'Attendance Reports', icon: 'bar-chart' },
+        { key: 'import', href: '/hr/import', label: 'Import Attendance', icon: 'download' },
         { key: 'requests', href: '/hr/requests', label: 'Leave Requests', icon: 'check-square' },
       ],
     },
