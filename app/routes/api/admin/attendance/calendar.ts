@@ -24,9 +24,18 @@ export const GET = createRoute(verifyJWT, requireRole('hr', 'master'), async (c)
     return c.json({ error: 'userId is required' }, 400)
   }
 
-  const user = await c.env.DB.prepare('SELECT id, name, department, biometric_ref FROM users WHERE id = ?')
+  const user = await c.env.DB.prepare(
+    'SELECT id, name, department, biometric_ref, designation, degrees FROM users WHERE id = ?'
+  )
     .bind(userId)
-    .first<{ id: string; name: string; department: string | null; biometric_ref: string | null }>()
+    .first<{
+      id: string
+      name: string
+      department: string | null
+      biometric_ref: string | null
+      designation: string | null
+      degrees: string | null
+    }>()
   if (!user) {
     return c.json({ error: 'Employee not found' }, 404)
   }
@@ -88,7 +97,14 @@ export const GET = createRoute(verifyJWT, requireRole('hr', 'master'), async (c)
   }
 
   return c.json({
-    user: { id: user.id, name: user.name, department: user.department, biometricRef: user.biometric_ref },
+    user: {
+      id: user.id,
+      name: user.name,
+      department: user.department,
+      biometricRef: user.biometric_ref,
+      designation: user.designation,
+      degrees: user.degrees,
+    },
     month,
     days,
     summary,

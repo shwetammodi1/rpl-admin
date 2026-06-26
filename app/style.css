@@ -4507,3 +4507,21 @@ textarea:focus-visible {
 .import-link:hover {
   text-decoration: underline;
 }
+
+/* ---- Attendance employee designation/degrees ---- */
+.att-employee-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 4px;
+}
+.att-employee-desig {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rpl-gold);
+  letter-spacing: 0.01em;
+}
+.att-employee-degrees {
+  font-size: 11px;
+  color: var(--rpl-muted);
+}

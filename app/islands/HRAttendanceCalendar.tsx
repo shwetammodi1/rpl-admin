@@ -6,7 +6,14 @@ type Day = { date: string; day: number; dow: number; status: string; inTime: str
 type Summary = { present: number; absent: number; late: number; leave: number }
 type RecentPunch = { time: number; direction: string | null }
 type CalendarData = {
-  user: { id: string; name: string; department: string | null; biometricRef: string | null }
+  user: {
+    id: string
+    name: string
+    department: string | null
+    biometricRef: string | null
+    designation: string | null
+    degrees: string | null
+  }
   month: string
   days: Day[]
   summary: Summary
@@ -286,6 +293,12 @@ export default function HRAttendanceCalendar() {
                 </option>
               ))}
             </select>
+            {calendar?.user.designation && (
+              <div className="att-employee-meta">
+                <span className="att-employee-desig">{calendar.user.designation}</span>
+                {calendar.user.degrees && <span className="att-employee-degrees">{calendar.user.degrees}</span>}
+              </div>
+            )}
           </div>
         </div>
         <div className="att-summary">
