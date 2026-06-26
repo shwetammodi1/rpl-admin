@@ -33,7 +33,10 @@ const NAV: Record<Role, NavGroup[]> = {
   master: [
     {
       label: 'Administration',
-      items: [{ key: 'users', href: '/master', label: 'User Access', icon: 'users' }],
+      items: [
+        { key: 'users', href: '/master', label: 'User Access', icon: 'users' },
+        { key: 'provision', href: '/master/provision', label: 'Faculty Accounts', icon: 'user-check' },
+      ],
     },
     {
       label: 'Reports',

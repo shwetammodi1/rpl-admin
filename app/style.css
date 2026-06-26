@@ -4525,3 +4525,78 @@ textarea:focus-visible {
   font-size: 11px;
   color: var(--rpl-muted);
 }
+
+/* ---- Profile menu designation ---- */
+.profile-head-desig {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rpl-gold);
+}
+
+/* ---- Provision faculty accounts ---- */
+.provision-card {
+  padding: 24px;
+}
+.provision-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.provision-intro {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--rpl-muted);
+}
+.provision-intro b {
+  color: var(--rpl-ink);
+}
+.provision-warn {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--rpl-ink);
+}
+.provision-actions {
+  display: flex;
+  gap: 10px;
+}
+.provision-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--rpl-border);
+  border-radius: var(--r-md);
+}
+.provision-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.provision-table th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--rpl-navy-50);
+  color: var(--rpl-slate);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.provision-table td {
+  padding: 10px 12px;
+  border-top: 1px solid var(--rpl-border);
+  color: var(--rpl-ink);
+}
+.provision-mono {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 12px;
+}
+.provision-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+}
+.provision-tag.is-created { background: var(--tint-present-bg); color: var(--rpl-present); }
+.provision-tag.is-updated { background: var(--tint-short-bg); color: var(--rpl-hr); }
+.provision-tag.is-kept { background: var(--rpl-navy-50); color: var(--rpl-muted); }

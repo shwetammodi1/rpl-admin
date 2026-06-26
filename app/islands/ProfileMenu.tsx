@@ -33,13 +33,15 @@ function initials(name: string) {
 
 export default function ProfileMenu({ role, initial }: { role: Role; initial: string }) {
   const [open, setOpen] = useState(false)
-  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null)
+  const [user, setUser] = useState<{ name: string; email: string; role: string; designation?: string | null } | null>(
+    null
+  )
 
   useEffect(() => {
     const token = localStorage.getItem('rpl_token')
     if (!token) return
     fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => (r.ok ? r.json<{ name: string; email: string; role: string }>() : null))
+      .then((r) => (r.ok ? r.json<{ name: string; email: string; role: string; designation?: string | null }>() : null))
       .then((u) => {
         if (u) setUser(u)
       })
@@ -87,6 +89,7 @@ export default function ProfileMenu({ role, initial }: { role: Role; initial: st
             <div className="profile-head-avatar">{ini}</div>
             <div className="profile-head-info">
               <span className="profile-head-name">{name || 'Account'}</span>
+              {user?.designation && <span className="profile-head-desig">{user.designation}</span>}
               {user?.email && <span className="profile-head-email">{user.email}</span>}
               <span className={`profile-role-badge is-${role}`}>{ROLE_LABEL[role] ?? role}</span>
             </div>
