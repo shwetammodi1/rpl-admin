@@ -51,6 +51,9 @@ type ExistingUser = { id: string; email: string | null; password_hash: string | 
 // so re-running never resets a password that's already in use.
 export const POST = createRoute(verifyJWT, requireRole('master'), async (c) => {
   const db = c.env.DB
+  // ?reset=1 regenerates a fresh password for everyone (use when the credential
+  // list wasn't saved); otherwise already-provisioned accounts keep their password.
+  const reset = c.req.query('reset') === '1'
   const out: { name: string; email: string; password: string; status: 'created' | 'updated' | 'kept' }[] = []
 
   for (const s of STAFF) {
@@ -69,7 +72,11 @@ export const POST = createRoute(verifyJWT, requireRole('master'), async (c) => {
     }
 
     const provisioned =
-      user && user.password_hash && user.password_hash !== '!imported' && (user.email ?? '').endsWith('@rplmaheshwari.com')
+      !reset &&
+      user &&
+      user.password_hash &&
+      user.password_hash !== '!imported' &&
+      (user.email ?? '').endsWith('@rplmaheshwari.com')
 
     if (provisioned && user) {
       await db

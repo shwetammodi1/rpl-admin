@@ -30,13 +30,16 @@ export default function ProvisionFaculty() {
       })
   }, [])
 
-  const provision = async () => {
-    if (!confirm('Create/refresh login accounts for all faculty? Passwords are shown once — note them down.')) return
+  const provision = async (reset: boolean) => {
+    const msg = reset
+      ? 'RESET passwords for ALL faculty? Everyone gets a NEW password (old ones stop working). Download the CSV after.'
+      : 'Create/refresh login accounts for all faculty? Passwords are shown once — note them down.'
+    if (!confirm(msg)) return
     const token = localStorage.getItem('rpl_token')
     setBusy(true)
     setError('')
     try {
-      const res = await fetch('/api/admin/staff/provision', {
+      const res = await fetch(`/api/admin/staff/provision${reset ? '?reset=1' : ''}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       })
@@ -80,11 +83,14 @@ export default function ProvisionFaculty() {
           aur unki designation + degrees. Jinke accounts pehle se set hain unka password nahi badlega.
         </p>
 
-        {!result && (
-          <button type="button" className="btn-primary" disabled={busy} onClick={provision}>
-            {busy ? 'Provisioning…' : 'Provision Faculty Accounts'}
+        <div className="provision-actions">
+          <button type="button" className="btn-primary" disabled={busy} onClick={() => provision(false)}>
+            {busy ? 'Working…' : 'Provision Faculty Accounts'}
           </button>
-        )}
+          <button type="button" className="btn-gold" disabled={busy} onClick={() => provision(true)}>
+            <Icon name="refresh" size={14} /> Reset all passwords &amp; show
+          </button>
+        </div>
 
         {error && (
           <div className="import-alert is-error">
