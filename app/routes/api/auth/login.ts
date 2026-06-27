@@ -14,7 +14,7 @@ export const POST = createRoute(async (c) => {
   }
 
   const row = await c.env.DB.prepare(
-    'SELECT id, name, email, password_hash, role, department FROM users WHERE email = ? OR LOWER(name) = ?'
+    'SELECT id, name, email, password_hash, role, department FROM users WHERE LOWER(email) = ? OR LOWER(name) = ?'
   )
     .bind(identifier, identifier)
     .first<{ id: string; name: string; email: string; password_hash: string; role: Role; department: string | null }>()
