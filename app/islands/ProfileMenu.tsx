@@ -6,6 +6,7 @@ type Link = { href: string; label: string; icon: string }
 
 const NAV: Record<string, Link[]> = {
   faculty: [
+    { href: '/dashboard/profile', label: 'View Profile', icon: 'user' },
     { href: '/dashboard', label: 'Dashboard', icon: 'home' },
     { href: '/dashboard/apply', label: 'Apply for Leave', icon: 'calendar-plus' },
     { href: '/dashboard/applications', label: 'My Applications', icon: 'list' },
