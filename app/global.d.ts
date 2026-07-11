@@ -10,6 +10,11 @@ declare global {
     MSG91_SENDER?: string
     BIOMETRIC_PUSH_USER?: string
     BIOMETRIC_PUSH_PASS?: string
+    // TimeWatch upstream fetch API (for the pull integration). When set, a
+    // { FromDate, ToDate, DeviceID, UserID } query fetches live punches from here,
+    // stores them, and returns them. TIMEWATCH_AUTH is sent as the Authorization header.
+    TIMEWATCH_API_URL?: string
+    TIMEWATCH_AUTH?: string
   }
 }
 

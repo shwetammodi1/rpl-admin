@@ -95,14 +95,53 @@ export const POST = createRoute(async (c) => {
       return c.json({ Success: false, Message: 'Invalid FromDate/ToDate (use YYYY-MM-DD).' }, 400)
     }
 
+    const devFilter = topDeviceId // DeviceID
+    const userFilter = pickRef(parsed) // UserID
+
+    // --- PULL mode: fetch live from TimeWatch's own API, store, and return ---
+    // Only active when TIMEWATCH_API_URL is configured (a secret). This is what
+    // brings in NEW data (users/dates not already in our DB).
+    const upstream = c.env.TIMEWATCH_API_URL
+    if (upstream) {
+      try {
+        const upRes = await fetch(upstream, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(c.env.TIMEWATCH_AUTH ? { Authorization: c.env.TIMEWATCH_AUTH } : {}),
+          },
+          body: JSON.stringify({
+            FromDate: String(fromRaw).slice(0, 10),
+            ToDate: String(toRaw).slice(0, 10),
+            DeviceID: devFilter,
+            UserID: userFilter,
+          }),
+        })
+        const up = (await upRes.json().catch(() => ({}))) as { Data?: Record<string, unknown>[] }
+        const upData = Array.isArray(up?.Data) ? up.Data : []
+        let stored = 0
+        for (const rec of upData) {
+          const ref = pickRef(rec)
+          const ms = parsePunchTime(pickField(rec, TIME_KEYS))
+          const dir = normalizeDirection(pickField(rec, DIR_KEYS))
+          if (!ref || ms == null) continue
+          const internal = await ensureDevice(c.env.DB, pickDeviceId(rec) || devFilter)
+          if (await ingestPunch(c.env.DB, internal, ref, ms, dir)) stored++
+        }
+        console.log(`📥 [timewatch:pull] upstream ${upRes.status} → ${upData.length} punch(es), ${stored} newly stored`)
+        return c.json({ Success: true, Message: 'Punch Data Fetched Successfully.', Data: upData, stored })
+      } catch (e) {
+        console.log('   ↳ ⚠️ upstream fetch failed:', String((e as Error)?.message ?? e))
+        return c.json({ Success: false, Message: 'Failed to reach TimeWatch upstream API.' }, 502)
+      }
+    }
+
+    // --- STORED mode (no upstream configured): return punches already in our DB ---
+    // We intentionally do NOT filter by DeviceID: punches are often stored under a
+    // different device label than the physical serial the caller sends (e.g. imports
+    // land under "TimeWatch-Import"), so filtering by it would silently hide data.
     const conds = ['p.punch_time >= ?', 'p.punch_time <= ?']
     const binds: (string | number)[] = [fromMs, toMs]
-    const devFilter = topDeviceId // DeviceID — echoed back, but NOT used to filter.
-    const userFilter = pickRef(parsed) // UserID
-    // NOTE: we intentionally do NOT filter by DeviceID. Punches are often stored
-    // under a different device label than the physical serial the caller sends
-    // (e.g. imports land under "TimeWatch-Import"), so filtering by DeviceID would
-    // silently hide real data. Filter by date range + UserID only.
     if (userFilter) {
       conds.push('p.biometric_ref = ?')
       binds.push(userFilter)
