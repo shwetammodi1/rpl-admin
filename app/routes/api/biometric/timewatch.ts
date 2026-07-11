@@ -26,16 +26,6 @@ const DIR_KEYS = ['InOutMode', 'direction', 'Direction', 'InOut', 'inout', 'in_o
 const FROM_KEYS = ['FromDate', 'fromDate', 'from_date', 'from', 'FromDt', 'startDate', 'StartDate']
 const TO_KEYS = ['ToDate', 'toDate', 'to_date', 'to', 'ToDt', 'endDate', 'EndDate']
 
-const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000 // college is in India (UTC+5:30)
-function pad(n: number) {
-  return String(n).padStart(2, '0')
-}
-// Epoch ms -> "YYYY-MM-DDTHH:MM:SS" in IST (TimeWatch's PunchTime format).
-function istIso(ms: number): string {
-  const d = new Date(ms + IST_OFFSET_MS)
-  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`
-}
-
 // TimeWatch may send the full envelope `{ Data: [...] }`, a bare array, or a
 // single punch object. Normalize all three into a flat list of punch records.
 function extractRecords(parsed: Record<string, unknown>): Record<string, unknown>[] {
@@ -82,98 +72,35 @@ export const POST = createRoute(async (c) => {
     return c.json({ Success: false, Message: 'Invalid device credentials' }, 401)
   }
 
-  // --- FETCH / QUERY mode ---
-  // A payload of { FromDate, ToDate, DeviceID?, UserID? } is a request for punches,
-  // not a punch to store. Return the stored punches for that range in TimeWatch's
-  // { Success, Message, Data:[...] } response format.
+  // --- STORE-REQUEST mode ---
+  // A payload of { FromDate, ToDate, DeviceID, UserID } is stored as ONE new row in
+  // timewatch_requests, and that single row is returned — only the current request.
   const fromRaw = pickField(parsed, FROM_KEYS)
   const toRaw = pickField(parsed, TO_KEYS)
   if (records.length === 0 && fromRaw != null && toRaw != null) {
-    const fromMs = parsePunchTime(`${String(fromRaw).slice(0, 10)} 00:00:00`)
-    const toMs = parsePunchTime(`${String(toRaw).slice(0, 10)} 23:59:59`)
-    if (fromMs == null || toMs == null) {
-      return c.json({ Success: false, Message: 'Invalid FromDate/ToDate (use YYYY-MM-DD).' }, 400)
-    }
+    const id = crypto.randomUUID()
+    const fromDate = String(fromRaw).slice(0, 10)
+    const toDate = String(toRaw).slice(0, 10)
+    const deviceId = topDeviceId || null
+    const userId = pickRef(parsed) || null
+    const createdAt = Date.now()
 
-    const devFilter = topDeviceId // DeviceID
-    const userFilter = pickRef(parsed) // UserID
-
-    // --- PULL mode: fetch live from TimeWatch's own API, store, and return ---
-    // Only active when TIMEWATCH_API_URL is configured (a secret). This is what
-    // brings in NEW data (users/dates not already in our DB).
-    const upstream = c.env.TIMEWATCH_API_URL
-    if (upstream) {
-      try {
-        const upRes = await fetch(upstream, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(c.env.TIMEWATCH_AUTH ? { Authorization: c.env.TIMEWATCH_AUTH } : {}),
-          },
-          body: JSON.stringify({
-            FromDate: String(fromRaw).slice(0, 10),
-            ToDate: String(toRaw).slice(0, 10),
-            DeviceID: devFilter,
-            UserID: userFilter,
-          }),
-        })
-        const up = (await upRes.json().catch(() => ({}))) as { Data?: Record<string, unknown>[] }
-        const upData = Array.isArray(up?.Data) ? up.Data : []
-        let stored = 0
-        for (const rec of upData) {
-          const ref = pickRef(rec)
-          const ms = parsePunchTime(pickField(rec, TIME_KEYS))
-          const dir = normalizeDirection(pickField(rec, DIR_KEYS))
-          if (!ref || ms == null) continue
-          const internal = await ensureDevice(c.env.DB, pickDeviceId(rec) || devFilter)
-          if (await ingestPunch(c.env.DB, internal, ref, ms, dir)) stored++
-        }
-        console.log(`📥 [timewatch:pull] upstream ${upRes.status} → ${upData.length} punch(es), ${stored} newly stored`)
-        // Response mirrors TimeWatch's exact format ({Success, Message, Data}) and
-        // returns only THIS request's data. Storing happens silently in the background.
-        return c.json({ Success: true, Message: 'Punch Data Fetched Successfully.', Data: upData })
-      } catch (e) {
-        console.log('   ↳ ⚠️ upstream fetch failed:', String((e as Error)?.message ?? e))
-        return c.json({ Success: false, Message: 'Failed to reach TimeWatch upstream API.' }, 502)
-      }
-    }
-
-    // --- STORED mode (no upstream configured): return punches already in our DB ---
-    // We intentionally do NOT filter by DeviceID: punches are often stored under a
-    // different device label than the physical serial the caller sends (e.g. imports
-    // land under "TimeWatch-Import"), so filtering by it would silently hide data.
-    const conds = ['p.punch_time >= ?', 'p.punch_time <= ?']
-    const binds: (string | number)[] = [fromMs, toMs]
-    if (userFilter) {
-      conds.push('p.biometric_ref = ?')
-      binds.push(userFilter)
-    }
-
-    const { results } = await c.env.DB.prepare(
-      `SELECT p.biometric_ref AS UserID, p.punch_time AS pt, p.direction AS dir,
-              d.serial AS serial, d.name AS name
-       FROM biometric_punches p
-       LEFT JOIN biometric_devices d ON d.id = p.device_id
-       WHERE ${conds.join(' AND ')}
-       ORDER BY p.punch_time ASC
-       LIMIT 5000`
+    await c.env.DB.prepare(
+      'INSERT INTO timewatch_requests (id, from_date, to_date, device_id, user_id, created_at) VALUES (?, ?, ?, ?, ?, ?)'
     )
-      .bind(...binds)
-      .all<{ UserID: string; pt: number; dir: string | null; serial: string | null; name: string | null }>()
+      .bind(id, fromDate, toDate, deviceId, userId, createdAt)
+      .run()
 
-    const Data = results.map((r) => ({
-      UserID: r.UserID,
-      PunchTime: istIso(r.pt),
-      DeviceID: r.serial ?? devFilter ?? '',
-      DeviceName: r.name ?? '',
-      InOutMode: r.dir === 'out' ? '1' : '0',
-      VerifyMode: '',
-    }))
-
-    console.log(
-      `📤 [timewatch:fetch] ${String(fromRaw).slice(0, 10)}..${String(toRaw).slice(0, 10)} device=${devFilter || '*'} user=${userFilter || '*'} → ${Data.length} punch(es)`
-    )
-    return c.json({ Success: true, Message: 'Punch Data Fetched Successfully.', Data })
+    const row = {
+      id,
+      FromDate: fromDate,
+      ToDate: toDate,
+      DeviceID: deviceId,
+      UserID: userId,
+      CreatedAt: new Date(createdAt).toISOString(),
+    }
+    console.log(`🧾 [timewatch:request] stored 1 row id=${id} user=${userId ?? '-'} ${fromDate}..${toDate}`)
+    return c.json({ Success: true, Message: 'Stored.', Data: [row] })
   }
 
   let accepted = 0
