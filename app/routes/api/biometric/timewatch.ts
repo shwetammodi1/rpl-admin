@@ -97,12 +97,12 @@ export const POST = createRoute(async (c) => {
 
     const conds = ['p.punch_time >= ?', 'p.punch_time <= ?']
     const binds: (string | number)[] = [fromMs, toMs]
-    const devFilter = topDeviceId // DeviceID (matches our serial or internal id)
+    const devFilter = topDeviceId // DeviceID — echoed back, but NOT used to filter.
     const userFilter = pickRef(parsed) // UserID
-    if (devFilter) {
-      conds.push('(d.serial = ? OR d.id = ?)')
-      binds.push(devFilter, devFilter)
-    }
+    // NOTE: we intentionally do NOT filter by DeviceID. Punches are often stored
+    // under a different device label than the physical serial the caller sends
+    // (e.g. imports land under "TimeWatch-Import"), so filtering by DeviceID would
+    // silently hide real data. Filter by date range + UserID only.
     if (userFilter) {
       conds.push('p.biometric_ref = ?')
       binds.push(userFilter)
