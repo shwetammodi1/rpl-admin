@@ -49,6 +49,12 @@ const STAFF: Staff[] = [
   { name: 'Rishi Mishra', email: 'Rishi.mishra@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
   { name: 'Babita Mishra', email: 'Babita.mishra@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
   { name: 'Girish Mehta', email: 'Girish.mehta@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
+  // Batch 3 — 4 already imported (matched by Pay Code), Sanjay Vyas is new
+  { ref: '125', name: 'Anjubala Panwar', email: 'Anjubala.panwar@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
+  { ref: '126', name: 'Purnima Bhati', email: 'Purnima.bhati@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
+  { ref: '132', name: 'Meghna Shrivastava', email: 'Meghna.shrivastava@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
+  { ref: '144', name: 'Deepak Agiwal', email: 'Deepak.agiwal@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
+  { name: 'Sanjay Vyas', email: 'Sanjay.vyas@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
 ]
 
 const PW_CHARS = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
