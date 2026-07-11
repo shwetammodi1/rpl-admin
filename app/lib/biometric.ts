@@ -63,8 +63,8 @@ export async function ensureDevice(db: D1Database, deviceId: string): Promise<st
 const REF_KEYS = ['biometricRef', 'userId', 'UserId', 'userid', 'user_id', 'UserID', 'EmployeeCode', 'employeeCode', 'empCode', 'EmpCode', 'pin', 'PIN', 'Pin', 'enrollId', 'EnrollNumber', 'emp_id', 'EmployeeId']
 const TIME_KEYS = ['punchTime', 'PunchTime', 'punch_time', 'LogDate', 'logDate', 'LogDateTime', 'AttDateTime', 'DateTime', 'dateTime', 'EventTime', 'eventTime', 'time', 'datetime']
 const DIR_KEYS = ['direction', 'Direction', 'InOut', 'inout', 'in_out', 'status', 'Status', 'C1', 'io', 'type']
-const DEVICE_KEYS = ['deviceId', 'DeviceId', 'deviceid', 'serial', 'Serial', 'sn', 'SN', 'DeviceSerialNo', 'deviceSerial', 'SerialNumber', 'serialNumber']
-const ARRAY_KEYS = ['punches', 'data', 'records', 'logs', 'AttendanceLogs', 'attendance', 'Table']
+const DEVICE_KEYS = ['deviceId', 'DeviceId', 'DeviceID', 'deviceid', 'serial', 'Serial', 'sn', 'SN', 'DeviceSerialNo', 'deviceSerial', 'SerialNumber', 'serialNumber']
+const ARRAY_KEYS = ['punches', 'data', 'Data', 'records', 'logs', 'AttendanceLogs', 'attendance', 'Table']
 
 export function parseIncoming(raw: string, contentType: string | undefined): Record<string, unknown> {
   if (!raw) return {}

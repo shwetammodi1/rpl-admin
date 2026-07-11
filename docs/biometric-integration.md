@@ -28,7 +28,13 @@ Either way the **payload format is the same** — only the URL differs.
 |---|---|---|
 | Single punch (direct) | `POST` | `https://admin.rplmaheshwari.com/api/biometric/punch` |
 | Many punches / bulk (direct) | `POST` | `https://admin.rplmaheshwari.com/api/biometric/sync` |
+| **TimeWatch cloud format** | `POST` | `https://admin.rplmaheshwari.com/api/biometric/timewatch` |
 | Relay (Hostinger) | `POST` | `https://palegreen-meerkat-171902.hostingersite.com/biometric.php` |
+
+> The `/timewatch` endpoint accepts TimeWatch's own punch JSON verbatim (see section 5a),
+> so no field renaming is needed on the vendor side. It also accepts a bare array or a
+> single record. Auth, idempotency and the `{accepted, duplicates}` response are identical
+> to `/sync`.
 
 ---
 
@@ -84,6 +90,43 @@ Content-Type: application/json
   ]
 }
 ```
+
+## 5a. Payload — TimeWatch cloud format
+
+`POST /api/biometric/timewatch`
+
+Post TimeWatch's punch JSON exactly as the device/cloud produces it — the full
+envelope (`Data` array), a bare array, or a single record all work:
+
+```json
+{
+  "Success": true,
+  "Message": "Punch Data Fetched Successfully.",
+  "Data": [
+    {
+      "UserID": "369839",
+      "PunchTime": "2025-07-01T07:53:49",
+      "InsertedOn": "2025-07-01T07:54:49",
+      "DeviceID": "TW6000PW02240232",
+      "DeviceName": "IKOLAHA FACTORY",
+      "InOutMode": "0",
+      "VerifyMode": "Face"
+    }
+  ]
+}
+```
+
+Field mapping (extra fields like `InsertedOn`, `DeviceName`, `VerifyMode` are ignored):
+
+| TimeWatch field | Maps to | Notes |
+|---|---|---|
+| `UserID` | `ref` (employee pay code) | must match a portal user's `biometric_ref` to become attendance |
+| `PunchTime` | punch timestamp | ISO without a zone is treated as **IST** |
+| `DeviceID` | device serial | auto-registers the device if new |
+| `InOutMode` | direction | `0` → **In**, `1` → **Out**; other values → generic punch |
+
+Response: `{ "Success": true, "Message": "Punch data received.", "accepted": N, "duplicates": N, "skipped": N }`.
+`skipped` counts records missing a `UserID` or a parseable `PunchTime`.
 
 ---
 
