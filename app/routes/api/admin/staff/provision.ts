@@ -2,7 +2,7 @@ import { createRoute } from '../../../../lib/factory'
 import { verifyJWT, requireRole } from '../../../../lib/jwt'
 import { hashPassword } from '../../../../lib/password'
 
-type Staff = { ref?: string; name: string; email: string; designation: string; degrees: string }
+type Staff = { ref?: string; name: string; email: string; designation: string; degrees: string; role?: string }
 
 // Canonical faculty/staff list (from the college staff details). `ref` = TimeWatch
 // Pay Code (biometric_ref) for those already present from the attendance import;
@@ -32,6 +32,17 @@ const STAFF: Staff[] = [
   { name: 'Neha Solanki', email: 'Neha.solanki@rplmaheshwari.com', designation: 'Assistant Professor', degrees: 'MPSET 2024, M.A, B.Sc.' },
   { name: 'Shraddha Verma', email: 'Shraddha.verma@rplmaheshwari.com', designation: 'Assistant Professor', degrees: 'M.Com, LLB, UGC NET, MPSET' },
   { name: 'Venus Rathore', email: 'Venus.rathore@rplmaheshwari.com', designation: 'Assistant Professor', degrees: 'BCA, MCA' },
+  // New joinings (faculty)
+  { name: 'Hemraj Ahuja', email: 'Hemraj.ahuja@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
+  { name: 'Rachna Bajaj', email: 'Rachna.bajaj@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
+  { name: 'Mrinal Singh Jat', email: 'Mrinal.jat@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
+  { name: 'Monica Yadav', email: 'Monica.yadav@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
+  { name: 'Rajat Yadav', email: 'Rajat.yadav@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
+  { name: 'Shaily Agrawal', email: 'Shaily.agrawal@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
+  // Leadership (full admin access)
+  { name: 'President', email: 'President@rplmaheshwari.com', designation: 'President', degrees: '', role: 'master' },
+  { name: 'Secretary', email: 'Secretary@rplmaheshwari.com', designation: 'Secretary', degrees: '', role: 'master' },
+  { name: 'Principal', email: 'Principal@rplmaheshwari.com', designation: 'Principal', degrees: '', role: 'master' },
 ]
 
 const PW_CHARS = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -71,6 +82,8 @@ export const POST = createRoute(verifyJWT, requireRole('master'), async (c) => {
         .first<ExistingUser>()
     }
 
+    const role = s.role ?? 'faculty'
+
     const provisioned =
       !reset &&
       user &&
@@ -80,8 +93,8 @@ export const POST = createRoute(verifyJWT, requireRole('master'), async (c) => {
 
     if (provisioned && user) {
       await db
-        .prepare("UPDATE users SET role = 'faculty', designation = ?, degrees = ? WHERE id = ?")
-        .bind(s.designation, s.degrees, user.id)
+        .prepare('UPDATE users SET role = ?, designation = ?, degrees = ? WHERE id = ?')
+        .bind(role, s.designation, s.degrees, user.id)
         .run()
       out.push({ name: s.name, email: user.email ?? s.email, password: '(already set)', status: 'kept' })
       continue
@@ -92,16 +105,16 @@ export const POST = createRoute(verifyJWT, requireRole('master'), async (c) => {
 
     if (user) {
       await db
-        .prepare("UPDATE users SET email = ?, password_hash = ?, role = 'faculty', designation = ?, degrees = ? WHERE id = ?")
-        .bind(s.email, hash, s.designation, s.degrees, user.id)
+        .prepare('UPDATE users SET email = ?, password_hash = ?, role = ?, designation = ?, degrees = ? WHERE id = ?')
+        .bind(s.email, hash, role, s.designation, s.degrees, user.id)
         .run()
       out.push({ name: s.name, email: s.email, password, status: 'updated' })
     } else {
       await db
         .prepare(
-          "INSERT INTO users (id, name, email, password_hash, role, designation, degrees, biometric_ref) VALUES (?, ?, ?, ?, 'faculty', ?, ?, ?)"
+          'INSERT INTO users (id, name, email, password_hash, role, designation, degrees, biometric_ref) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
         )
-        .bind(crypto.randomUUID(), s.name, s.email, hash, s.designation, s.degrees, s.ref ?? null)
+        .bind(crypto.randomUUID(), s.name, s.email, hash, role, s.designation, s.degrees, s.ref ?? null)
         .run()
       out.push({ name: s.name, email: s.email, password, status: 'created' })
     }
