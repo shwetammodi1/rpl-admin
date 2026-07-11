@@ -43,6 +43,8 @@ const STAFF: Staff[] = [
   { name: 'President', email: 'President@rplmaheshwari.com', designation: 'President', degrees: '', role: 'master' },
   { name: 'Secretary', email: 'Secretary@rplmaheshwari.com', designation: 'Secretary', degrees: '', role: 'master' },
   { name: 'Principal', email: 'Principal@rplmaheshwari.com', designation: 'Principal', degrees: '', role: 'master' },
+  // Library
+  { name: 'Librarian', email: 'Librarian@rplmaheshwari.com', designation: 'Librarian', degrees: '' },
 ]
 
 const PW_CHARS = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
