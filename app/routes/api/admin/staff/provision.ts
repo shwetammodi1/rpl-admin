@@ -45,6 +45,10 @@ const STAFF: Staff[] = [
   { name: 'Principal', email: 'Principal@rplmaheshwari.com', designation: 'Principal', degrees: '', role: 'master' },
   // Library
   { name: 'Librarian', email: 'Librarian@rplmaheshwari.com', designation: 'Librarian', degrees: '' },
+  // New joinings (batch 2)
+  { name: 'Rishi Mishra', email: 'Rishi.mishra@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
+  { name: 'Babita Mishra', email: 'Babita.mishra@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
+  { name: 'Girish Mehta', email: 'Girish.mehta@rplmaheshwari.com', designation: 'Assistant Professor', degrees: '' },
 ]
 
 const PW_CHARS = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
