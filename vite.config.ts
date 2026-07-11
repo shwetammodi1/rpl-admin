@@ -23,7 +23,11 @@ export default defineConfig(({ mode }) => {
     plugins: [
       honox({
         client: { input: ['./app/client.ts', './app/style.css'] },
-        devServer: { adapter },
+        // Wrap the adapter so getPlatformProxy runs with remote bindings enabled,
+        // proxying the DB (D1) binding to the real production database.
+        devServer: {
+          adapter: () => adapter({ proxy: { experimental: { remoteBindings: true } } }),
+        },
       }),
       build(),
     ],

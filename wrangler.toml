@@ -7,3 +7,6 @@ pages_build_output_dir = "dist"
 binding = "DB"
 database_name = "rpl-admin"
 database_id = "29a6f5d7-aca0-4752-8683-2ba822cdedd5"
+# Proxy this binding to the REAL production D1 during local dev (remote bindings).
+# Requires Cloudflare auth (CLOUDFLARE_API_TOKEN or `wrangler login`).
+remote = true
