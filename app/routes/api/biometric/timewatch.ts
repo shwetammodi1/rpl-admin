@@ -53,10 +53,20 @@ export const POST = createRoute(async (c) => {
 
   // Capture the raw request so the vendor's exact format stays inspectable in D1.
   const debugStr = `${c.req.method} ${c.req.url}\nct=${contentType ?? ''} len=${c.req.header('content-length') ?? '0'} ua=${c.req.header('user-agent') ?? ''}\nbody=${raw}`
-  console.log('[biometric:timewatch]', debugStr)
   await captureDebug(c.env.DB, 'timewatch', contentType, viaBasic || viaDevice, debugStr)
 
+  // Live log: show the incoming call + a readable summary of each punch.
+  console.log(
+    `\n📥 [timewatch] ${new Date().toISOString()} — ${records.length} punch(es), auth=${viaBasic ? 'basic' : viaDevice ? 'device-key' : 'NONE'}`
+  )
+  for (const rec of records) {
+    console.log(
+      `   • UserID=${pickRef(rec) || '?'} PunchTime=${pickField(rec, TIME_KEYS) ?? '?'} InOutMode=${pickField(rec, DIR_KEYS) ?? '-'} DeviceID=${pickDeviceId(rec) || topDeviceId || '-'}`
+    )
+  }
+
   if (!viaBasic && !viaDevice) {
+    console.log('   ↳ ❌ 401 Invalid device credentials')
     return c.json({ Success: false, Message: 'Invalid device credentials' }, 401)
   }
 
@@ -83,6 +93,8 @@ export const POST = createRoute(async (c) => {
     if (inserted) accepted++
     else duplicates++
   }
+
+  console.log(`   ↳ ✅ accepted=${accepted} duplicates=${duplicates} skipped=${skipped}`)
 
   return c.json({ Success: true, Message: 'Punch data received.', accepted, duplicates, skipped })
 })

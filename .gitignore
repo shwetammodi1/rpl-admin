@@ -17,6 +17,9 @@ dist-ssr
 .dev.vars
 worker-configuration.d.ts
 
+# Postman collections (contain real credentials)
+*.postman_collection.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
