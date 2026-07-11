@@ -129,7 +129,9 @@ export const POST = createRoute(async (c) => {
           if (await ingestPunch(c.env.DB, internal, ref, ms, dir)) stored++
         }
         console.log(`📥 [timewatch:pull] upstream ${upRes.status} → ${upData.length} punch(es), ${stored} newly stored`)
-        return c.json({ Success: true, Message: 'Punch Data Fetched Successfully.', Data: upData, stored })
+        // Response mirrors TimeWatch's exact format ({Success, Message, Data}) and
+        // returns only THIS request's data. Storing happens silently in the background.
+        return c.json({ Success: true, Message: 'Punch Data Fetched Successfully.', Data: upData })
       } catch (e) {
         console.log('   ↳ ⚠️ upstream fetch failed:', String((e as Error)?.message ?? e))
         return c.json({ Success: false, Message: 'Failed to reach TimeWatch upstream API.' }, 502)
