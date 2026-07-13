@@ -56,7 +56,7 @@ export const POST = createRoute(async (c) => {
 
   const raw = await c.req.text()
   const parsed = parseIncoming(raw, contentType)
-  const records = toRecords(parsed)
+  let records = toRecords(parsed)
 
   const topDeviceId = pickDeviceId(parsed as Record<string, unknown>)
   const authDeviceId = topDeviceId || (records[0] ? pickDeviceId(records[0]) : '')
@@ -72,8 +72,9 @@ export const POST = createRoute(async (c) => {
     return c.json({ Success: false, Message: 'Invalid device credentials' }, 401)
   }
 
+  // Even a blank/empty hit stores one row — every hit to the API is recorded.
   if (records.length === 0) {
-    return c.json({ Success: false, Message: 'No data in payload.' }, 400)
+    records = [parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : {}]
   }
 
   const createdAt = Date.now()
@@ -116,7 +117,7 @@ export const POST = createRoute(async (c) => {
         extras[2] ?? null,
         extras[3] ?? null,
         extras[4] ?? null,
-        JSON.stringify(rec),
+        Object.keys(rec).length ? JSON.stringify(rec) : raw || '{}',
         createdAt
       )
       .run()
