@@ -68,9 +68,8 @@ export const POST = createRoute(async (c) => {
   const debugStr = `${c.req.method} ${c.req.url}\nct=${contentType ?? ''} len=${c.req.header('content-length') ?? '0'}\nbody=${raw}`
   await captureDebug(c.env.DB, 'timewatch', contentType, viaBasic || viaDevice, debugStr)
 
-  if (!viaBasic && !viaDevice) {
-    return c.json({ Success: false, Message: 'Invalid device credentials' }, 401)
-  }
+  // NOTE: authentication intentionally NOT enforced — this endpoint accepts
+  // requests without credentials (public). viaBasic/viaDevice are kept for logging only.
 
   // Even a blank/empty hit stores one row — every hit to the API is recorded.
   if (records.length === 0) {
