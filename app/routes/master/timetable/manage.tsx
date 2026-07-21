@@ -2,6 +2,7 @@ import { createRoute } from '../../../lib/factory'
 import Sidebar from '../../../components/Sidebar'
 import Topbar from '../../../components/Topbar'
 import PageHeader from '../../../components/PageHeader'
+import TimetableManage from '../../../islands/TimetableManage'
 
 export default createRoute((c) =>
   c.render(
@@ -11,12 +12,7 @@ export default createRoute((c) =>
         <Topbar role="master" />
         <main className="admin-content">
           <PageHeader title="Manage Timetable" subtitle="Create, edit and publish the college timetable" />
-          <section className="admin-card tt-placeholder">
-            <p>
-              <strong>Phase 2 — page created (admin only).</strong> Filters, the lecture entry form
-              and the editable grid are built in Phase 6.
-            </p>
-          </section>
+          <TimetableManage />
         </main>
       </div>
     </div>,

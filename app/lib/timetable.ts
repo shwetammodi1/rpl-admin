@@ -83,6 +83,36 @@ export const LEGEND = [
 export const HOLIDAY_DATE = 15
 export const LEAVE_DATE = 22
 
+// ---- Master data (dummy for now; Phase 7 loads these from the API) ----
+export const SUBJECTS = [
+  { name: 'Marketing', colour: 'blue' },
+  { name: 'HR Management', colour: 'green' },
+  { name: 'Finance', colour: 'orange' },
+  { name: 'Marketing Management', colour: 'orange' },
+  { name: 'Digital Marketing', colour: 'purple' },
+  { name: 'Computer Lab', colour: 'pink' },
+]
+export const FACULTY_LIST = [
+  'Devendra Nagwanshi',
+  'Dr. Anjana Gorani',
+  'Dr. Chetan Joshi',
+  'Prof. Vikas Joshi',
+  'Prof. Manish Ranade',
+  'Krishna Gour',
+]
+export const DEPARTMENTS = ['Commerce & Management', 'Computer Applications', 'Science']
+export const COURSES = ['BBA', 'BCA', 'B.Com', 'MBA']
+export const SEMESTERS = ['Sem I', 'Sem II', 'Sem III', 'Sem IV', 'Sem V', 'Sem VI']
+export const SECTIONS = ['A', 'B', 'C']
+export const BUILDINGS = ['Main Building', 'IT Block']
+export const ROOMS = ['Room 108', 'Room 205', 'Room 210', 'Lab 1', 'Lab 2']
+export const LECTURE_TYPES = ['Theory', 'Practical', 'Lab', 'Tutorial']
+export const ACADEMIC_YEARS = ['2026-27', '2025-26']
+
+export function colourOf(subject: string) {
+  return SUBJECTS.find((s) => s.name === subject)?.colour ?? 'gray'
+}
+
 export function fmt12(hhmm: string) {
   const [h, m] = hhmm.split(':').map(Number)
   const ampm = h >= 12 ? 'PM' : 'AM'

@@ -5255,6 +5255,68 @@ textarea:focus-visible {
   .tt-cal-week { overflow-x: auto; }
 }
 
+/* ---- Timetable admin manage (Phase 6) ---- */
+.tt-manage-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  padding: 16px 18px;
+}
+.tt-manage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+}
+.tt-manage-actions .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.tt-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  padding: 16px 18px 4px;
+}
+.tt-form-wide { grid-column: 1 / -1; }
+.tt-form-grid input {
+  padding: 7px 10px;
+  border: 1px solid var(--rpl-border);
+  border-radius: var(--r-md);
+  font: inherit;
+  font-size: 13px;
+  color: var(--rpl-ink);
+  background: #fff;
+}
+.tt-form-grid select:focus,
+.tt-form-grid input:focus {
+  outline: none;
+  border-color: var(--rpl-gold);
+  box-shadow: var(--rpl-focus);
+}
+.tt-form-actions {
+  display: flex;
+  gap: 10px;
+  padding: 14px 18px 18px;
+}
+.tt-form-actions .btn-primary { display: inline-flex; align-items: center; gap: 7px; }
+.tt-row-actions { display: inline-flex; gap: 5px; }
+.tt-icon-btn.is-danger { color: var(--rpl-absent); }
+.tt-icon-btn.is-danger:hover { background: var(--tint-absent-bg, #fdecea); }
+.tt-flash {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: var(--r-md);
+  background: var(--tint-present-bg, #e8f5ef);
+  color: var(--rpl-present);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 /* ---- Timetable module (Phase 2 scaffolding) ---- */
 .tt-placeholder {
   padding: 30px 28px;
