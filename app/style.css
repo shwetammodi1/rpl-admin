@@ -5120,6 +5120,141 @@ textarea:focus-visible {
   .tt-table { min-width: 0; font-size: 10px; }
 }
 
+/* ---- Timetable calendar (Phase 5) ---- */
+.tt-l-holiday { --tt-color: #c0392b; --tt-soft: #fdecea; }
+.tt-l-leave   { --tt-color: #b27d17; --tt-soft: #fdf3e0; }
+
+.tt-cal-head {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  background: var(--rpl-navy-50);
+  border-bottom: 1px solid var(--rpl-border);
+}
+.tt-cal-head span {
+  padding: 9px 8px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--rpl-slate);
+}
+.tt-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.tt-cal-cell {
+  min-height: 108px;
+  padding: 6px 6px 8px;
+  border-right: 1px solid var(--rpl-border);
+  border-bottom: 1px solid var(--rpl-border);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: pointer;
+  background: #fff;
+}
+.tt-cal-cell:nth-child(7n) { border-right: none; }
+.tt-cal-cell.is-out { background: #fbfcfd; }
+.tt-cal-cell.is-out .tt-cal-date { color: var(--rpl-off); }
+.tt-cal-cell.is-off { background: var(--rpl-paper); }
+.tt-cal-cell.is-holiday { background: #fdf6f5; }
+.tt-cal-cell.is-leave { background: #fdf9f0; }
+.tt-cal-cell.is-today { box-shadow: inset 0 0 0 2px var(--rpl-gold); }
+.tt-cal-date {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rpl-ink);
+  align-self: flex-start;
+}
+.tt-cal-cell.is-today .tt-cal-date {
+  background: var(--rpl-gold);
+  color: #fff;
+  border-radius: 999px;
+  min-width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+.tt-cal-event {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  text-align: left;
+  padding: 3px 6px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: var(--tt-soft);
+  font: inherit;
+  cursor: pointer;
+  overflow: hidden;
+}
+.tt-cal-event:hover { filter: brightness(0.96); }
+.tt-cal-event i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tt-color);
+  flex: 0 0 auto;
+}
+.tt-cal-ev-time {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 9.5px;
+  color: var(--tt-color);
+  flex: 0 0 auto;
+}
+.tt-cal-ev-name {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--rpl-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tt-cal-more { font-size: 10px; color: var(--rpl-muted); padding-left: 3px; }
+.tt-cal-tag {
+  align-self: flex-start;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 2px 7px;
+  border-radius: var(--r-sm);
+}
+.tt-cal-tag.is-holiday { background: #fdecea; color: #c0392b; }
+.tt-cal-tag.is-leave { background: #fdf3e0; color: #b27d17; }
+.tt-cal-tag.is-off { background: var(--rpl-navy-50); color: var(--rpl-off); }
+
+/* Calendar week view */
+.tt-cal-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.tt-cal-wcol { border-right: 1px solid var(--rpl-border); }
+.tt-cal-wcol:last-child { border-right: none; }
+.tt-cal-wcol.is-today .tt-cal-whead { background: var(--rpl-gold-50); }
+.tt-cal-whead {
+  padding: 9px 8px;
+  text-align: center;
+  background: var(--rpl-navy-50);
+  border-bottom: 1px solid var(--rpl-border);
+}
+.tt-cal-wbody {
+  padding: 8px 7px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 260px;
+}
+
+@media (max-width: 760px) {
+  .tt-cal-cell { min-height: 84px; }
+  .tt-cal-ev-time { display: none; }
+  .tt-cal-week { overflow-x: auto; }
+}
+
 /* ---- Timetable module (Phase 2 scaffolding) ---- */
 .tt-placeholder {
   padding: 30px 28px;

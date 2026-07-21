@@ -2,6 +2,7 @@ import { createRoute } from '../../../lib/factory'
 import Sidebar from '../../../components/Sidebar'
 import Topbar from '../../../components/Topbar'
 import PageHeader from '../../../components/PageHeader'
+import TimetableCalendar from '../../../islands/TimetableCalendar'
 
 export default createRoute((c) =>
   c.render(
@@ -11,12 +12,7 @@ export default createRoute((c) =>
         <Topbar role="faculty" />
         <main className="admin-content">
           <PageHeader title="Calendar View" subtitle="Monthly view of your lectures" />
-          <section className="admin-card tt-placeholder">
-            <p>
-              <strong>Phase 2 — page created.</strong> The monthly calendar (events per day,
-              month/week toggle, legend) is built in Phase 5.
-            </p>
-          </section>
+          <TimetableCalendar />
         </main>
       </div>
     </div>,
