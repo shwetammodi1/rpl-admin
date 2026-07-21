@@ -9,7 +9,7 @@ import {
   fmt12,
   fmtDate,
   isSameDay,
-  lecturesOn,
+  weekdayOf,
   dayKind,
   mondayOf,
 } from '../lib/timetable'
@@ -58,6 +58,19 @@ export default function TimetableCalendar({ admin = false }: { admin?: boolean }
 
   const monthLabel = `${MONTHS[month]} ${year}`
   const weekLabel = `${fmtDate(weekDates[0])} – ${fmtDate(weekDates[6])}`
+
+  // Group once per render — the month grid asks 42 times, so filtering and
+  // sorting inside every cell is wasteful.
+  const byDay = new Map<number, Lecture[]>()
+  for (const l of lectures) {
+    const list = byDay.get(l.day)
+    if (list) list.push(l)
+    else byDay.set(l.day, [l])
+  }
+  for (const list of byDay.values()) list.sort((a, b) => a.start.localeCompare(b.start))
+
+  const lecturesFor = (d: Date, kind: string) =>
+    kind === 'normal' ? byDay.get(weekdayOf(d)) ?? [] : []
 
   const renderEvent = (l: Lecture, d: Date, key: string) => (
     <button
@@ -119,7 +132,7 @@ export default function TimetableCalendar({ admin = false }: { admin?: boolean }
             {cells.map((d, i) => {
               const inMonth = d.getMonth() === month
               const kind = dayKind(d)
-              const list = lecturesOn(d, lectures)
+              const list = lecturesFor(d, kind)
               const isToday = isSameDay(d, today)
               const showAll = expanded && isSameDay(expanded, d)
               const visible = showAll ? list : list.slice(0, MAX_PER_CELL)
@@ -150,7 +163,7 @@ export default function TimetableCalendar({ admin = false }: { admin?: boolean }
           <div className="tt-cal-week">
             {weekDates.map((d, i) => {
               const kind = dayKind(d)
-              const list = lecturesOn(d, lectures)
+              const list = lecturesFor(d, kind)
               return (
                 <div key={i} className={`tt-cal-wcol ${isSameDay(d, today) ? 'is-today' : ''}`}>
                   <div className="tt-cal-whead">

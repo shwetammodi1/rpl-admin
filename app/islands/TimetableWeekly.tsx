@@ -45,18 +45,27 @@ export default function TimetableWeekly({ admin = false }: { admin?: boolean }) 
   sunday.setDate(sunday.getDate() + 6)
   const todayNum = weekOffset === 0 ? ((new Date().getDay() + 6) % 7) + 1 : -1
 
-  const at = (day: number, start: string) => LECTURES.find((l) => l.day === day && l.start === start)
-  const spanOf = (l: Lecture) => {
-    const s = SLOTS.findIndex((x) => x.start === l.start)
-    const e = SLOTS.findIndex((x) => x.end === l.end)
-    return e > s ? e - s + 1 : 1
+  // Build the grid lookups once per render instead of scanning the lecture
+  // list inside all 49 cells (7 days x 7 slots).
+  const slotIndex = new Map(SLOTS.map((s, i) => [s.start, i]))
+  const slotEndIndex = new Map(SLOTS.map((s, i) => [s.end, i]))
+  const cellMap = new Map<string, Lecture>()
+  const spanMap = new Map<string, number>()
+  const coveredSet = new Set<string>()
+
+  for (const l of LECTURES) {
+    const key = `${l.day}-${l.start}`
+    cellMap.set(key, l)
+    const s = slotIndex.get(l.start) ?? -1
+    const e = slotEndIndex.get(l.end) ?? -1
+    const span = s >= 0 && e > s ? e - s + 1 : 1
+    spanMap.set(key, span)
+    for (let k = 1; k < span; k++) coveredSet.add(`${l.day}-${s + k}`)
   }
-  const covered = (day: number, slotIdx: number) =>
-    LECTURES.some((l) => {
-      if (l.day !== day) return false
-      const s = SLOTS.findIndex((x) => x.start === l.start)
-      return slotIdx > s && slotIdx < s + spanOf(l)
-    })
+
+  const at = (day: number, start: string) => cellMap.get(`${day}-${start}`)
+  const spanOf = (l: Lecture) => spanMap.get(`${l.day}-${l.start}`) ?? 1
+  const covered = (day: number, slotIdx: number) => coveredSet.has(`${day}-${slotIdx}`)
 
   const exportCsv = () => {
     const rows = [['Day', 'Start', 'End', 'Subject', 'Section', 'Semester', 'Room', 'Building', 'Type']]
