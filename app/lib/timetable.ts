@@ -141,12 +141,12 @@ export function weekdayOf(d: Date) {
   return ((d.getDay() + 6) % 7) + 1
 }
 
-/** Lectures for a given date, honouring dummy holiday/leave/week-off rules. */
-export function lecturesOn(d: Date): Lecture[] {
+/** Lectures for a given date, honouring holiday/leave/week-off rules. */
+export function lecturesOn(d: Date, source: Lecture[] = LECTURES): Lecture[] {
   const wd = weekdayOf(d)
   if (wd === 7) return []
   if (d.getDate() === HOLIDAY_DATE || d.getDate() === LEAVE_DATE) return []
-  return LECTURES.filter((l) => l.day === wd).sort((a, b) => a.start.localeCompare(b.start))
+  return source.filter((l) => l.day === wd).sort((a, b) => a.start.localeCompare(b.start))
 }
 
 export function dayKind(d: Date): 'holiday' | 'leave' | 'off' | 'normal' {

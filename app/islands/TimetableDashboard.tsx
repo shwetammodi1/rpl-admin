@@ -1,44 +1,15 @@
 import { useEffect, useState } from 'hono/jsx'
 import Icon from '../components/Icon'
+import { type Lecture, DAYS_SHORT, weekdayOf } from '../lib/timetable'
+import { fetchMyTimetable } from '../lib/timetableApi'
 
-// PHASE 3 — UI only. All data below is static dummy data; Phase 7 replaces it
-// with the real API. The only network call is the existing /api/auth/me, used
-// just to greet the logged-in faculty by name.
-
-type Lecture = {
-  start: string
-  end: string
-  subject: string
-  colour: string
-  room: string
-  section: string
-  type: string
-}
-
-const TODAY: Lecture[] = [
-  { start: '09:00', end: '10:00', subject: 'Marketing', colour: 'blue', room: 'Room 205', section: 'BBA II A', type: 'Theory' },
-  { start: '10:30', end: '11:30', subject: 'Digital Marketing', colour: 'purple', room: 'Room 108', section: 'BBA III B', type: 'Theory' },
-  { start: '13:30', end: '14:30', subject: 'Marketing Management', colour: 'orange', room: 'Room 205', section: 'MBA I A', type: 'Theory' },
-  { start: '15:00', end: '16:30', subject: 'Computer Lab', colour: 'pink', room: 'Lab 2', section: 'BCA II', type: 'Practical' },
-]
-
-const WEEK = [
-  { day: 'Mon', count: 5 },
-  { day: 'Tue', count: 4 },
-  { day: 'Wed', count: 6 },
-  { day: 'Thu', count: 3 },
-  { day: 'Fri', count: 5 },
-  { day: 'Sat', count: 2 },
-]
+// PHASE 7 — real data. Today's schedule, the weekly chart and the summary
+// cards are all derived from the signed-in faculty's published timetable.
 
 const QUICK = {
-  department: 'Commerce & Management',
   workingHours: '09:00 AM – 04:30 PM',
-  students: 180,
   effectiveFrom: '01 Jul 2026',
 }
-
-const STATS = { lectures: 25, subjects: 6, workingDays: 6, attendance: 94 }
 
 function toMinutes(hhmm: string) {
   const [h, m] = hhmm.split(':').map(Number)
@@ -66,6 +37,8 @@ function greeting(h: number) {
 
 export default function TimetableDashboard() {
   const [name, setName] = useState('')
+  const [department, setDepartment] = useState('')
+  const [lectures, setLectures] = useState<Lecture[]>([])
   const [now, setNow] = useState(() => {
     const d = new Date()
     return d.getHours() * 60 + d.getMinutes()
@@ -75,10 +48,15 @@ export default function TimetableDashboard() {
     const token = localStorage.getItem('rpl_token')
     if (token) {
       fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
-        .then((r) => (r.ok ? r.json<{ name: string }>() : null))
-        .then((u) => u && setName(u.name))
+        .then((r) => (r.ok ? r.json<{ name: string; department: string | null }>() : null))
+        .then((u) => {
+          if (!u) return
+          setName(u.name)
+          setDepartment(u.department ?? '')
+        })
         .catch(() => {})
     }
+    fetchMyTimetable().then(setLectures).catch(() => setLectures([]))
     const t = setInterval(() => {
       const d = new Date()
       setNow(d.getHours() * 60 + d.getMinutes())
@@ -86,9 +64,23 @@ export default function TimetableDashboard() {
     return () => clearInterval(t)
   }, [])
 
+  // Derived from the real timetable
+  const todayNum = weekdayOf(new Date())
+  const TODAY = lectures.filter((l) => l.day === todayNum).sort((a, b) => a.start.localeCompare(b.start))
+  const WEEK = DAYS_SHORT.slice(0, 6).map((day, i) => ({
+    day,
+    count: lectures.filter((l) => l.day === i + 1).length,
+  }))
+  const STATS = {
+    lectures: lectures.length,
+    subjects: new Set(lectures.map((l) => l.subject)).size,
+    workingDays: new Set(lectures.map((l) => l.day)).size,
+    attendance: 94,
+  }
+
   const next = TODAY.find((l) => lectureStatus(l, now) !== 'completed')
   const remaining = TODAY.filter((l) => lectureStatus(l, now) === 'upcoming').length
-  const maxCount = Math.max(...WEEK.map((w) => w.count))
+  const maxCount = Math.max(1, ...WEEK.map((w) => w.count))
   const firstName = name ? name.replace(/^(Dr\.?|Prof\.?|Mr\.?|Ms\.?|Mrs\.?|Smt\.?|Shri)\s+/i, '').split(' ')[0] : ''
 
   let countdown = ''
@@ -153,6 +145,7 @@ export default function TimetableDashboard() {
             <h3 className="admin-card-title">Today's Schedule</h3>
             <span className="tt-chip">{TODAY.length} lectures</span>
           </div>
+          {TODAY.length === 0 && <div className="tt-empty">No lectures scheduled for today.</div>}
           <ol className="tt-timeline">
             {TODAY.map((l) => {
               const st = lectureStatus(l, now)
@@ -232,9 +225,9 @@ export default function TimetableDashboard() {
           </div>
           <dl className="tt-quick">
             <div><dt>Faculty</dt><dd>{name || '—'}</dd></div>
-            <div><dt>Department</dt><dd>{QUICK.department}</dd></div>
+            <div><dt>Department</dt><dd>{department || '—'}</dd></div>
             <div><dt>Working Hours</dt><dd>{QUICK.workingHours}</dd></div>
-            <div><dt>Students</dt><dd>{QUICK.students}</dd></div>
+            <div><dt>Sections</dt><dd>{new Set(lectures.map((l) => l.section)).size || '—'}</dd></div>
             <div><dt>Effective From</dt><dd>{QUICK.effectiveFrom}</dd></div>
           </dl>
         </section>

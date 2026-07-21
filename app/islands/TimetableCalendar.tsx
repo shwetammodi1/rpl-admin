@@ -1,5 +1,6 @@
-import { useState } from 'hono/jsx'
+import { useEffect, useState } from 'hono/jsx'
 import Icon from '../components/Icon'
+import { fetchAdminSlots, fetchMyTimetable, toLecture } from '../lib/timetableApi'
 import {
   type Lecture,
   DAYS,
@@ -25,6 +26,12 @@ export default function TimetableCalendar({ admin = false }: { admin?: boolean }
   const [weekOffset, setWeekOffset] = useState(0)
   const [selected, setSelected] = useState<{ lecture: Lecture; date: Date } | null>(null)
   const [expanded, setExpanded] = useState<Date | null>(null)
+  const [lectures, setLectures] = useState<Lecture[]>([])
+
+  useEffect(() => {
+    const load = admin ? fetchAdminSlots().then((s) => s.map(toLecture)) : fetchMyTimetable()
+    load.then(setLectures).catch(() => setLectures([]))
+  }, [])
 
   // ---- month grid (6 weeks, Monday-first) ----
   const year = cursor.getFullYear()
@@ -112,7 +119,7 @@ export default function TimetableCalendar({ admin = false }: { admin?: boolean }
             {cells.map((d, i) => {
               const inMonth = d.getMonth() === month
               const kind = dayKind(d)
-              const list = lecturesOn(d)
+              const list = lecturesOn(d, lectures)
               const isToday = isSameDay(d, today)
               const showAll = expanded && isSameDay(expanded, d)
               const visible = showAll ? list : list.slice(0, MAX_PER_CELL)
@@ -143,7 +150,7 @@ export default function TimetableCalendar({ admin = false }: { admin?: boolean }
           <div className="tt-cal-week">
             {weekDates.map((d, i) => {
               const kind = dayKind(d)
-              const list = lecturesOn(d)
+              const list = lecturesOn(d, lectures)
               return (
                 <div key={i} className={`tt-cal-wcol ${isSameDay(d, today) ? 'is-today' : ''}`}>
                   <div className="tt-cal-whead">

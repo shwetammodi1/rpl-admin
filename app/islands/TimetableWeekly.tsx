@@ -1,29 +1,41 @@
-import { useState } from 'hono/jsx'
+import { useEffect, useState } from 'hono/jsx'
 import Icon from '../components/Icon'
 import {
   type Lecture,
   DAYS,
   DAYS_SHORT,
   SLOTS,
-  LECTURES,
   LEGEND,
   fmt12,
   mondayOf,
   fmtDate,
 } from '../lib/timetable'
+import { fetchAdminSlots, fetchMyTimetable, toLecture } from '../lib/timetableApi'
 
-// PHASE 4 — UI only. Data/types/utils live in lib/timetable.ts so the calendar
-// view reuses exactly the same source. `admin` shows the extra faculty /
-// department filters that only an admin needs.
-
-const F = 'Devendra Nagwanshi'
-const D = 'Commerce & Management'
+// PHASE 7 — now loads real data. Faculty see their own published timetable;
+// admins see the college-wide slots. `admin` also shows the extra filters.
 
 export default function TimetableWeekly({ admin = false }: { admin?: boolean }) {
   const [view, setView] = useState<'week' | 'day' | 'list'>('week')
   const [weekOffset, setWeekOffset] = useState(0)
   const [dayIdx, setDayIdx] = useState(() => ((new Date().getDay() + 6) % 7) + 1)
   const [selected, setSelected] = useState<Lecture | null>(null)
+  const [LECTURES, setLectures] = useState<Lecture[]>([])
+  const [loading, setLoading] = useState(true)
+  const [facultyNames, setFacultyNames] = useState<string[]>([])
+
+  useEffect(() => {
+    const load = admin
+      ? fetchAdminSlots().then((slots) => {
+          setFacultyNames([...new Set(slots.map((s) => s.faculty).filter(Boolean) as string[])])
+          return slots.map(toLecture)
+        })
+      : fetchMyTimetable()
+    load
+      .then(setLectures)
+      .catch(() => setLectures([]))
+      .finally(() => setLoading(false))
+  }, [])
 
   const monday = mondayOf(weekOffset)
   const sunday = new Date(monday)
@@ -65,16 +77,13 @@ export default function TimetableWeekly({ admin = false }: { admin?: boolean }) 
       {/* Toolbar */}
       <section className="admin-card tt-toolbar">
         {admin && (
-          <>
-            <label className="tt-tb-field">
-              <span>Faculty</span>
-              <select><option>All Faculty</option><option selected>{F}</option></select>
-            </label>
-            <label className="tt-tb-field">
-              <span>Department</span>
-              <select><option>All Departments</option><option selected>{D}</option></select>
-            </label>
-          </>
+          <label className="tt-tb-field">
+            <span>Faculty</span>
+            <select>
+              <option>All Faculty</option>
+              {facultyNames.map((f) => <option key={f}>{f}</option>)}
+            </select>
+          </label>
         )}
 
         <div className="tt-tb-week">
@@ -106,8 +115,15 @@ export default function TimetableWeekly({ admin = false }: { admin?: boolean }) 
         </button>
       </section>
 
+      {loading && <section className="admin-card tt-empty">Loading timetable…</section>}
+      {!loading && LECTURES.length === 0 && (
+        <section className="admin-card tt-empty">
+          No published lectures yet.{admin ? ' Add them from Manage Timetable.' : ' Your timetable will appear here once published.'}
+        </section>
+      )}
+
       {/* WEEK VIEW */}
-      {view === 'week' && (
+      {!loading && LECTURES.length > 0 && view === 'week' && (
         <section className="admin-card tt-grid-card">
           <div className="tt-grid-scroll">
             <table className="tt-table">
@@ -163,7 +179,7 @@ export default function TimetableWeekly({ admin = false }: { admin?: boolean }) 
       )}
 
       {/* DAY VIEW */}
-      {view === 'day' && (
+      {!loading && LECTURES.length > 0 && view === 'day' && (
         <section className="admin-card">
           <div className="admin-card-header">
             <h3 className="admin-card-title">{DAYS[dayIdx - 1]}</h3>
@@ -193,7 +209,7 @@ export default function TimetableWeekly({ admin = false }: { admin?: boolean }) 
       )}
 
       {/* LIST VIEW */}
-      {view === 'list' && (
+      {!loading && LECTURES.length > 0 && view === 'list' && (
         <section className="admin-card">
           <div className="admin-table-wrap">
             <table className="admin-table">

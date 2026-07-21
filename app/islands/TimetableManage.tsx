@@ -1,10 +1,10 @@
-import { useState } from 'hono/jsx'
+import { useEffect, useState } from 'hono/jsx'
 import Icon from '../components/Icon'
+import { fetchAdminSlots, fetchMasterData, type MasterData } from '../lib/timetableApi'
 import {
   DAYS,
   DAYS_SHORT,
   SLOTS,
-  LECTURES,
   SUBJECTS,
   FACULTY_LIST,
   DEPARTMENTS,
@@ -42,23 +42,6 @@ type Row = {
 }
 
 let seq = 1
-const INITIAL: Row[] = LECTURES.map((l) => ({
-  id: seq++,
-  day: l.day,
-  start: l.start,
-  end: l.end,
-  subject: l.subject,
-  faculty: l.faculty,
-  department: l.department,
-  course: 'BBA',
-  semester: l.semester,
-  section: l.section,
-  room: l.room,
-  building: l.building,
-  type: l.type,
-  status: 'Published',
-  notes: '',
-}))
 
 const BLANK: Omit<Row, 'id'> = {
   day: 1,
@@ -78,13 +61,49 @@ const BLANK: Omit<Row, 'id'> = {
 }
 
 export default function TimetableManage() {
-  const [rows, setRows] = useState<Row[]>(INITIAL)
+  const [rows, setRows] = useState<Row[]>([])
+  const [loading, setLoading] = useState(true)
+  const [md, setMd] = useState<MasterData | null>(null)
   const [form, setForm] = useState<Omit<Row, 'id'>>({ ...BLANK })
   const [editingId, setEditingId] = useState<number | null>(null)
   const [open, setOpen] = useState(false)
   const [filterFaculty, setFilterFaculty] = useState('')
   const [filterDay, setFilterDay] = useState('')
   const [msg, setMsg] = useState('')
+
+  useEffect(() => {
+    fetchAdminSlots()
+      .then((slots) =>
+        setRows(
+          slots.map((s) => ({
+            id: seq++,
+            day: s.day,
+            start: s.start_time,
+            end: s.end_time,
+            subject: s.subject ?? '—',
+            faculty: s.faculty ?? '—',
+            department: s.department ?? '—',
+            course: s.course ?? '—',
+            semester: s.semester ?? '—',
+            section: s.section ?? '—',
+            room: s.room ?? '—',
+            building: s.building ?? '—',
+            type: s.lecture_type ?? 'Theory',
+            status: s.status === 'published' ? 'Published' : 'Draft',
+            notes: s.notes ?? '',
+          }))
+        )
+      )
+      .catch(() => setRows([]))
+      .finally(() => setLoading(false))
+    fetchMasterData().then(setMd).catch(() => setMd(null))
+  }, [])
+
+  // Dropdown sources — real master data when available, constants as fallback.
+  const facultyOpts = md?.faculty.map((f) => f.name) ?? FACULTY_LIST
+  const subjectOpts = md?.subjects.map((s) => s.name) ?? SUBJECTS.map((s) => s.name)
+  const roomOpts = md?.classrooms.map((r) => r.name) ?? ROOMS
+  const buildingOpts = md ? [...new Set(md.classrooms.map((r) => r.building ?? '—'))] : BUILDINGS
 
   const set = <K extends keyof Omit<Row, 'id'>>(k: K, v: Omit<Row, 'id'>[K]) =>
     setForm({ ...form, [k]: v })
@@ -157,7 +176,7 @@ export default function TimetableManage() {
           <span>Faculty</span>
           <select value={filterFaculty} onChange={(e) => setFilterFaculty((e.target as HTMLSelectElement).value)}>
             <option value="">All Faculty</option>
-            {FACULTY_LIST.map((f) => <option key={f}>{f}</option>)}
+            {facultyOpts.map((f) => <option key={f}>{f}</option>)}
           </select>
         </label>
         <label className="tt-tb-field">
@@ -208,13 +227,13 @@ export default function TimetableManage() {
             <label className="tt-tb-field">
               <span>Faculty</span>
               <select value={form.faculty} onChange={(e) => set('faculty', (e.target as HTMLSelectElement).value)}>
-                {FACULTY_LIST.map((f) => <option key={f}>{f}</option>)}
+                {facultyOpts.map((f) => <option key={f}>{f}</option>)}
               </select>
             </label>
             <label className="tt-tb-field">
               <span>Subject</span>
               <select value={form.subject} onChange={(e) => set('subject', (e.target as HTMLSelectElement).value)}>
-                {SUBJECTS.map((s) => <option key={s.name}>{s.name}</option>)}
+                {subjectOpts.map((s) => <option key={s}>{s}</option>)}
               </select>
             </label>
             <label className="tt-tb-field">
@@ -244,13 +263,13 @@ export default function TimetableManage() {
             <label className="tt-tb-field">
               <span>Building</span>
               <select value={form.building} onChange={(e) => set('building', (e.target as HTMLSelectElement).value)}>
-                {BUILDINGS.map((d) => <option key={d}>{d}</option>)}
+                {buildingOpts.map((d) => <option key={d}>{d}</option>)}
               </select>
             </label>
             <label className="tt-tb-field">
               <span>Room</span>
               <select value={form.room} onChange={(e) => set('room', (e.target as HTMLSelectElement).value)}>
-                {ROOMS.map((d) => <option key={d}>{d}</option>)}
+                {roomOpts.map((d) => <option key={d}>{d}</option>)}
               </select>
             </label>
             <label className="tt-tb-field">
