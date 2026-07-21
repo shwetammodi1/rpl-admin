@@ -2,6 +2,7 @@ import { createRoute } from '../../../lib/factory'
 import Sidebar from '../../../components/Sidebar'
 import Topbar from '../../../components/Topbar'
 import PageHeader from '../../../components/PageHeader'
+import TimetableWeekly from '../../../islands/TimetableWeekly'
 
 export default createRoute((c) =>
   c.render(
@@ -11,11 +12,7 @@ export default createRoute((c) =>
         <Topbar role="master" />
         <main className="admin-content">
           <PageHeader title="Weekly Timetable" subtitle="Week grid for any faculty or department" />
-          <section className="admin-card tt-placeholder">
-            <p>
-              <strong>Phase 2 — page created.</strong> The weekly grid is built in Phase 4.
-            </p>
-          </section>
+          <TimetableWeekly admin />
         </main>
       </div>
     </div>,
