@@ -36,3 +36,56 @@ export const GET = createRoute(verifyJWT, requireRole('hr', 'master'), async (c)
 
   return c.json({ slots: results })
 })
+
+type SlotBody = {
+  facultyId?: string
+  subjectId?: string
+  classroomId?: string
+  day?: number
+  startTime?: string
+  endTime?: string
+  department?: string
+  course?: string
+  semester?: string
+  section?: string
+  lectureType?: string
+  status?: string
+  notes?: string
+  academicYear?: string
+}
+
+// Create a lecture slot.
+export const POST = createRoute(verifyJWT, requireRole('hr', 'master'), async (c) => {
+  const b = (await c.req.json().catch(() => null)) as SlotBody | null
+  if (!b || !b.day || !b.startTime || !b.endTime) {
+    return c.json({ error: 'day, startTime and endTime are required' }, 400)
+  }
+
+  const id = crypto.randomUUID()
+  await c.env.DB.prepare(
+    `INSERT INTO timetable_slots
+       (id, faculty_id, subject_id, classroom_id, day, start_time, end_time,
+        department, course, semester, section, lecture_type, status, notes, academic_year)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  )
+    .bind(
+      id,
+      b.facultyId ?? null,
+      b.subjectId ?? null,
+      b.classroomId ?? null,
+      b.day,
+      b.startTime,
+      b.endTime,
+      b.department ?? null,
+      b.course ?? null,
+      b.semester ?? null,
+      b.section ?? null,
+      b.lectureType ?? 'Theory',
+      b.status === 'published' ? 'published' : 'draft',
+      b.notes ?? null,
+      b.academicYear ?? null
+    )
+    .run()
+
+  return c.json({ ok: true, id })
+})

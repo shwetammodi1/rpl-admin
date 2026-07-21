@@ -1,182 +1,231 @@
 import { useEffect, useState } from 'hono/jsx'
 import Icon from '../components/Icon'
-import { fetchAdminSlots, fetchMasterData, type MasterData } from '../lib/timetableApi'
+import {
+  type AdminSlot,
+  type MasterData,
+  type SlotPayload,
+  fetchAdminSlots,
+  fetchMasterData,
+  createSlot,
+  updateSlot,
+  deleteSlot,
+} from '../lib/timetableApi'
 import {
   DAYS,
   DAYS_SHORT,
   SLOTS,
-  SUBJECTS,
-  FACULTY_LIST,
   DEPARTMENTS,
   COURSES,
   SEMESTERS,
   SECTIONS,
-  BUILDINGS,
-  ROOMS,
   LECTURE_TYPES,
   ACADEMIC_YEARS,
-  colourOf,
   fmt12,
 } from '../lib/timetable'
 
-// PHASE 6 — Admin UI only. Rows live in local state so the screen is usable to
-// review; Phase 8 swaps these local operations for real API calls, and Phase 10
-// adds the conflict detection rules.
+// PHASE 8 — real CRUD. The form works with record IDs; every save/delete hits
+// the API and the grid is re-fetched. Phase 10 adds conflict detection.
 
-type Row = {
-  id: number
-  day: number
-  start: string
-  end: string
-  subject: string
-  faculty: string
-  department: string
-  course: string
-  semester: string
-  section: string
-  room: string
-  building: string
-  type: string
-  status: 'Published' | 'Draft'
-  notes: string
-}
-
-let seq = 1
-
-const BLANK: Omit<Row, 'id'> = {
+const BLANK: SlotPayload = {
+  facultyId: '',
+  subjectId: '',
+  classroomId: '',
   day: 1,
-  start: '09:00',
-  end: '10:00',
-  subject: SUBJECTS[0].name,
-  faculty: FACULTY_LIST[0],
+  startTime: '09:00',
+  endTime: '10:00',
   department: DEPARTMENTS[0],
   course: COURSES[0],
   semester: SEMESTERS[2],
   section: 'A',
-  room: ROOMS[1],
-  building: BUILDINGS[0],
-  type: LECTURE_TYPES[0],
-  status: 'Draft',
+  lectureType: LECTURE_TYPES[0],
+  status: 'draft',
   notes: '',
+  academicYear: ACADEMIC_YEARS[0],
 }
 
 export default function TimetableManage() {
-  const [rows, setRows] = useState<Row[]>([])
-  const [loading, setLoading] = useState(true)
+  const [rows, setRows] = useState<AdminSlot[]>([])
   const [md, setMd] = useState<MasterData | null>(null)
-  const [form, setForm] = useState<Omit<Row, 'id'>>({ ...BLANK })
-  const [editingId, setEditingId] = useState<number | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
+  const [form, setForm] = useState<SlotPayload>({ ...BLANK })
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
   const [filterFaculty, setFilterFaculty] = useState('')
   const [filterDay, setFilterDay] = useState('')
+  const [filterBuilding, setFilterBuilding] = useState('')
   const [msg, setMsg] = useState('')
+  const [err, setErr] = useState('')
+
+  const reload = () =>
+    fetchAdminSlots()
+      .then(setRows)
+      .catch(() => setRows([]))
 
   useEffect(() => {
-    fetchAdminSlots()
-      .then((slots) =>
-        setRows(
-          slots.map((s) => ({
-            id: seq++,
-            day: s.day,
-            start: s.start_time,
-            end: s.end_time,
-            subject: s.subject ?? '—',
-            faculty: s.faculty ?? '—',
-            department: s.department ?? '—',
-            course: s.course ?? '—',
-            semester: s.semester ?? '—',
-            section: s.section ?? '—',
-            room: s.room ?? '—',
-            building: s.building ?? '—',
-            type: s.lecture_type ?? 'Theory',
-            status: s.status === 'published' ? 'Published' : 'Draft',
-            notes: s.notes ?? '',
-          }))
-        )
-      )
-      .catch(() => setRows([]))
-      .finally(() => setLoading(false))
-    fetchMasterData().then(setMd).catch(() => setMd(null))
+    Promise.all([reload(), fetchMasterData().then(setMd).catch(() => setMd(null))]).finally(() =>
+      setLoading(false)
+    )
   }, [])
 
-  // Dropdown sources — real master data when available, constants as fallback.
-  const facultyOpts = md?.faculty.map((f) => f.name) ?? FACULTY_LIST
-  const subjectOpts = md?.subjects.map((s) => s.name) ?? SUBJECTS.map((s) => s.name)
-  const roomOpts = md?.classrooms.map((r) => r.name) ?? ROOMS
-  const buildingOpts = md ? [...new Set(md.classrooms.map((r) => r.building ?? '—'))] : BUILDINGS
-
-  const set = <K extends keyof Omit<Row, 'id'>>(k: K, v: Omit<Row, 'id'>[K]) =>
-    setForm({ ...form, [k]: v })
+  const set = <K extends keyof SlotPayload>(k: K, v: SlotPayload[K]) => setForm({ ...form, [k]: v })
 
   const flash = (t: string) => {
     setMsg(t)
-    setTimeout(() => setMsg(''), 3000)
+    setErr('')
+    setTimeout(() => setMsg(''), 3500)
   }
+  const fail = (t: string) => {
+    setErr(t)
+    setMsg('')
+    setTimeout(() => setErr(''), 4500)
+  }
+
+  const faculty = md?.faculty ?? []
+  const subjects = md?.subjects ?? []
+  const classrooms = md?.classrooms ?? []
+  const buildings = [...new Set(classrooms.map((r) => r.building).filter(Boolean) as string[])]
+  const roomOpts = filterBuilding ? classrooms.filter((r) => r.building === filterBuilding) : classrooms
 
   const startAdd = () => {
-    setForm({ ...BLANK })
+    setForm({
+      ...BLANK,
+      facultyId: faculty[0]?.id ?? '',
+      subjectId: subjects[0]?.id ?? '',
+      classroomId: classrooms[0]?.id ?? '',
+    })
     setEditingId(null)
     setOpen(true)
   }
 
-  const startEdit = (r: Row) => {
-    const { id, ...rest } = r
-    setForm(rest)
-    setEditingId(id)
+  const startEdit = (r: AdminSlot) => {
+    setForm({
+      facultyId: r.faculty_id ?? '',
+      subjectId: r.subject_id ?? '',
+      classroomId: r.classroom_id ?? '',
+      day: r.day,
+      startTime: r.start_time,
+      endTime: r.end_time,
+      department: r.department ?? '',
+      course: r.course ?? '',
+      semester: r.semester ?? '',
+      section: r.section ?? '',
+      lectureType: r.lecture_type ?? 'Theory',
+      status: r.status ?? 'draft',
+      notes: r.notes ?? '',
+      academicYear: r.academic_year ?? ACADEMIC_YEARS[0],
+    })
+    setEditingId(r.id)
     setOpen(true)
   }
 
-  const save = () => {
-    if (editingId) {
-      setRows(rows.map((r) => (r.id === editingId ? { ...form, id: editingId } : r)))
-      flash('Lecture updated (local preview — saved to server in Phase 8)')
+  const save = async () => {
+    setBusy(true)
+    const ok = editingId ? await updateSlot(editingId, form) : await createSlot(form)
+    if (ok) {
+      await reload()
+      flash(editingId ? 'Lecture updated.' : 'Lecture added.')
+      setOpen(false)
+      setEditingId(null)
     } else {
-      setRows([...rows, { ...form, id: seq++ }])
-      flash('Lecture added (local preview — saved to server in Phase 8)')
+      fail('Could not save — please try again.')
     }
-    setOpen(false)
-    setEditingId(null)
+    setBusy(false)
   }
 
-  const remove = (id: number) => {
-    if (!confirm('Delete this lecture?')) return
-    setRows(rows.filter((r) => r.id !== id))
-    flash('Lecture deleted (local preview)')
+  const remove = async (r: AdminSlot) => {
+    if (!confirm(`Delete ${r.subject ?? 'this lecture'} on ${DAYS[r.day - 1]} at ${fmt12(r.start_time)}?`)) return
+    setBusy(true)
+    const ok = await deleteSlot(r.id)
+    if (ok) {
+      await reload()
+      flash('Lecture deleted.')
+    } else fail('Could not delete — please try again.')
+    setBusy(false)
   }
 
-  const duplicate = (r: Row) => {
-    setRows([...rows, { ...r, id: seq++, status: 'Draft' }])
-    flash('Lecture duplicated as Draft')
+  const duplicate = async (r: AdminSlot) => {
+    setBusy(true)
+    const ok = await createSlot({
+      facultyId: r.faculty_id ?? '',
+      subjectId: r.subject_id ?? '',
+      classroomId: r.classroom_id ?? '',
+      day: r.day,
+      startTime: r.start_time,
+      endTime: r.end_time,
+      department: r.department ?? '',
+      course: r.course ?? '',
+      semester: r.semester ?? '',
+      section: r.section ?? '',
+      lectureType: r.lecture_type ?? 'Theory',
+      status: 'draft',
+      notes: r.notes ?? '',
+      academicYear: r.academic_year ?? ACADEMIC_YEARS[0],
+    })
+    if (ok) {
+      await reload()
+      flash('Lecture duplicated as Draft.')
+    } else fail('Could not duplicate.')
+    setBusy(false)
+  }
+
+  const togglePublish = async (r: AdminSlot) => {
+    setBusy(true)
+    const ok = await updateSlot(r.id, { status: r.status === 'published' ? 'draft' : 'published' })
+    if (ok) {
+      await reload()
+      flash(r.status === 'published' ? 'Moved to Draft.' : 'Published.')
+    } else fail('Could not change status.')
+    setBusy(false)
+  }
+
+  const publishAllDrafts = async () => {
+    const drafts = rows.filter((r) => r.status !== 'published')
+    if (drafts.length === 0) return flash('No drafts to publish.')
+    if (!confirm(`Publish ${drafts.length} draft lecture(s)?`)) return
+    setBusy(true)
+    for (const d of drafts) await updateSlot(d.id, { status: 'published' })
+    await reload()
+    flash(`${drafts.length} lecture(s) published.`)
+    setBusy(false)
+  }
+
+  const exportCsv = () => {
+    const head = ['Day', 'Start', 'End', 'Subject', 'Faculty', 'Course', 'Semester', 'Section', 'Room', 'Type', 'Status']
+    const lines = [head, ...visible.map((r) => [
+      DAYS[r.day - 1], r.start_time, r.end_time, r.subject ?? '', r.faculty ?? '',
+      r.course ?? '', r.semester ?? '', r.section ?? '', r.room ?? '', r.lecture_type, r.status,
+    ])]
+    const csv = lines.map((l) => l.map((x) => `"${x}"`).join(',')).join('\n')
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'timetable.csv'
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   const visible = rows
-    .filter((r) => (filterFaculty ? r.faculty === filterFaculty : true))
+    .filter((r) => (filterFaculty ? r.faculty_id === filterFaculty : true))
     .filter((r) => (filterDay ? String(r.day) === filterDay : true))
-    .sort((a, b) => a.day - b.day || a.start.localeCompare(b.start))
+    .filter((r) => (filterBuilding ? r.building === filterBuilding : true))
+    .sort((a, b) => a.day - b.day || a.start_time.localeCompare(b.start_time))
 
-  const published = rows.filter((r) => r.status === 'Published').length
-  const drafts = rows.length - published
+  const published = rows.filter((r) => r.status === 'published').length
 
   return (
     <div className="tt-week">
       {/* Filters */}
       <section className="admin-card tt-manage-filters">
-        {[
-          { label: 'Academic Year', opts: ACADEMIC_YEARS },
-          { label: 'Semester', opts: SEMESTERS },
-          { label: 'Department', opts: DEPARTMENTS },
-          { label: 'Course', opts: COURSES },
-        ].map((f) => (
-          <label className="tt-tb-field" key={f.label}>
-            <span>{f.label}</span>
-            <select>{f.opts.map((o) => <option key={o}>{o}</option>)}</select>
-          </label>
-        ))}
+        <label className="tt-tb-field">
+          <span>Academic Year</span>
+          <select>{ACADEMIC_YEARS.map((o) => <option key={o}>{o}</option>)}</select>
+        </label>
         <label className="tt-tb-field">
           <span>Faculty</span>
           <select value={filterFaculty} onChange={(e) => setFilterFaculty((e.target as HTMLSelectElement).value)}>
             <option value="">All Faculty</option>
-            {facultyOpts.map((f) => <option key={f}>{f}</option>)}
+            {faculty.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
           </select>
         </label>
         <label className="tt-tb-field">
@@ -188,31 +237,28 @@ export default function TimetableManage() {
         </label>
         <label className="tt-tb-field">
           <span>Building</span>
-          <select>{['All Buildings', ...BUILDINGS].map((o) => <option key={o}>{o}</option>)}</select>
-        </label>
-        <label className="tt-tb-field">
-          <span>Classroom</span>
-          <select>{['All Rooms', ...ROOMS].map((o) => <option key={o}>{o}</option>)}</select>
+          <select value={filterBuilding} onChange={(e) => setFilterBuilding((e.target as HTMLSelectElement).value)}>
+            <option value="">All Buildings</option>
+            {buildings.map((b) => <option key={b}>{b}</option>)}
+          </select>
         </label>
       </section>
 
       {/* Actions */}
       <section className="admin-card tt-manage-actions">
-        <button type="button" className="btn-primary" onClick={startAdd}>
+        <button type="button" className="btn-primary" disabled={busy} onClick={startAdd}>
           <Icon name="calendar-plus" size={15} /> Add Lecture
         </button>
-        <button type="button" className="tt-today-btn">Generate Timetable</button>
-        <button type="button" className="tt-today-btn">Save Draft</button>
-        <button type="button" className="tt-today-btn">Publish</button>
-        <button type="button" className="tt-today-btn">Duplicate Week</button>
-        <button type="button" className="tt-today-btn">Import</button>
-        <button type="button" className="tt-today-btn">Export</button>
+        <button type="button" className="tt-today-btn" disabled={busy} onClick={publishAllDrafts}>Publish All Drafts</button>
+        <button type="button" className="tt-today-btn" disabled={busy} onClick={() => reload()}>Refresh</button>
+        <button type="button" className="tt-today-btn" onClick={exportCsv}>Export</button>
         <div className="tt-tb-spacer" />
         <span className="tt-chip">{published} published</span>
-        <span className="tt-chip">{drafts} draft</span>
+        <span className="tt-chip">{rows.length - published} draft</span>
       </section>
 
       {msg && <div className="tt-flash"><Icon name="check-circle" size={15} /> {msg}</div>}
+      {err && <div className="tt-flash is-error"><Icon name="alert" size={15} /> {err}</div>}
 
       {/* Entry form */}
       {open && (
@@ -226,14 +272,14 @@ export default function TimetableManage() {
           <div className="tt-form-grid">
             <label className="tt-tb-field">
               <span>Faculty</span>
-              <select value={form.faculty} onChange={(e) => set('faculty', (e.target as HTMLSelectElement).value)}>
-                {facultyOpts.map((f) => <option key={f}>{f}</option>)}
+              <select value={form.facultyId} onChange={(e) => set('facultyId', (e.target as HTMLSelectElement).value)}>
+                {faculty.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
               </select>
             </label>
             <label className="tt-tb-field">
               <span>Subject</span>
-              <select value={form.subject} onChange={(e) => set('subject', (e.target as HTMLSelectElement).value)}>
-                {subjectOpts.map((s) => <option key={s}>{s}</option>)}
+              <select value={form.subjectId} onChange={(e) => set('subjectId', (e.target as HTMLSelectElement).value)}>
+                {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
               </select>
             </label>
             <label className="tt-tb-field">
@@ -261,15 +307,9 @@ export default function TimetableManage() {
               </select>
             </label>
             <label className="tt-tb-field">
-              <span>Building</span>
-              <select value={form.building} onChange={(e) => set('building', (e.target as HTMLSelectElement).value)}>
-                {buildingOpts.map((d) => <option key={d}>{d}</option>)}
-              </select>
-            </label>
-            <label className="tt-tb-field">
-              <span>Room</span>
-              <select value={form.room} onChange={(e) => set('room', (e.target as HTMLSelectElement).value)}>
-                {roomOpts.map((d) => <option key={d}>{d}</option>)}
+              <span>Classroom</span>
+              <select value={form.classroomId} onChange={(e) => set('classroomId', (e.target as HTMLSelectElement).value)}>
+                {roomOpts.map((r) => <option key={r.id} value={r.id}>{r.name}{r.building ? ` · ${r.building}` : ''}</option>)}
               </select>
             </label>
             <label className="tt-tb-field">
@@ -280,27 +320,27 @@ export default function TimetableManage() {
             </label>
             <label className="tt-tb-field">
               <span>Start Time</span>
-              <select value={form.start} onChange={(e) => set('start', (e.target as HTMLSelectElement).value)}>
+              <select value={form.startTime} onChange={(e) => set('startTime', (e.target as HTMLSelectElement).value)}>
                 {SLOTS.map((s) => <option key={s.start} value={s.start}>{fmt12(s.start)}</option>)}
               </select>
             </label>
             <label className="tt-tb-field">
               <span>End Time</span>
-              <select value={form.end} onChange={(e) => set('end', (e.target as HTMLSelectElement).value)}>
+              <select value={form.endTime} onChange={(e) => set('endTime', (e.target as HTMLSelectElement).value)}>
                 {SLOTS.map((s) => <option key={s.end} value={s.end}>{fmt12(s.end)}</option>)}
               </select>
             </label>
             <label className="tt-tb-field">
               <span>Lecture Type</span>
-              <select value={form.type} onChange={(e) => set('type', (e.target as HTMLSelectElement).value)}>
+              <select value={form.lectureType} onChange={(e) => set('lectureType', (e.target as HTMLSelectElement).value)}>
                 {LECTURE_TYPES.map((d) => <option key={d}>{d}</option>)}
               </select>
             </label>
             <label className="tt-tb-field">
               <span>Status</span>
-              <select value={form.status} onChange={(e) => set('status', (e.target as HTMLSelectElement).value as Row['status'])}>
-                <option>Draft</option>
-                <option>Published</option>
+              <select value={form.status} onChange={(e) => set('status', (e.target as HTMLSelectElement).value)}>
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
               </select>
             </label>
             <label className="tt-tb-field tt-form-wide">
@@ -309,8 +349,8 @@ export default function TimetableManage() {
             </label>
           </div>
           <div className="tt-form-actions">
-            <button type="button" className="btn-primary" onClick={save}>
-              <Icon name="check" size={15} /> {editingId ? 'Update Lecture' : 'Save Lecture'}
+            <button type="button" className="btn-primary" disabled={busy} onClick={save}>
+              <Icon name="check" size={15} /> {busy ? 'Saving…' : editingId ? 'Update Lecture' : 'Save Lecture'}
             </button>
             <button type="button" className="tt-today-btn" onClick={() => setOpen(false)}>Cancel</button>
           </div>
@@ -328,34 +368,38 @@ export default function TimetableManage() {
             <thead>
               <tr>
                 <th>Day</th><th>Time</th><th>Subject</th><th>Faculty</th>
-                <th>Section</th><th>Room</th><th>Type</th><th>Status</th><th>Actions</th>
+                <th>Class</th><th>Room</th><th>Type</th><th>Status</th><th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {visible.length === 0 && (
-                <tr><td colSpan={9} className="tt-empty">No lectures match these filters.</td></tr>
+              {loading && <tr><td colSpan={9} className="tt-empty">Loading…</td></tr>}
+              {!loading && visible.length === 0 && (
+                <tr><td colSpan={9} className="tt-empty">No lectures yet. Use “Add Lecture” to create one.</td></tr>
               )}
-              {visible.map((r) => (
+              {!loading && visible.map((r) => (
                 <tr key={r.id}>
                   <td>{DAYS_SHORT[r.day - 1]}</td>
-                  <td>{fmt12(r.start)} – {fmt12(r.end)}</td>
-                  <td><span className={`tt-badge tt-c-${colourOf(r.subject)}`}>{r.subject}</span></td>
-                  <td>{r.faculty}</td>
-                  <td>{r.section}</td>
-                  <td>{r.room}</td>
-                  <td>{r.type}</td>
+                  <td>{fmt12(r.start_time)} – {fmt12(r.end_time)}</td>
+                  <td><span className={`tt-badge tt-c-${r.colour ?? 'gray'}`}>{r.subject ?? '—'}</span></td>
+                  <td>{r.faculty ?? '—'}</td>
+                  <td>{[r.course, r.semester, r.section].filter(Boolean).join(' ') || '—'}</td>
+                  <td>{r.room ?? '—'}</td>
+                  <td>{r.lecture_type}</td>
                   <td>
-                    <span className={`tt-status is-${r.status === 'Published' ? 'completed' : 'upcoming'}`}>{r.status}</span>
+                    <button type="button" className={`tt-status is-${r.status === 'published' ? 'completed' : 'upcoming'} tt-status-btn`}
+                      title="Click to toggle" disabled={busy} onClick={() => togglePublish(r)}>
+                      {r.status === 'published' ? 'Published' : 'Draft'}
+                    </button>
                   </td>
                   <td>
                     <div className="tt-row-actions">
-                      <button type="button" className="tt-icon-btn" title="Edit" onClick={() => startEdit(r)}>
+                      <button type="button" className="tt-icon-btn" title="Edit" disabled={busy} onClick={() => startEdit(r)}>
                         <Icon name="file-text" size={14} />
                       </button>
-                      <button type="button" className="tt-icon-btn" title="Duplicate" onClick={() => duplicate(r)}>
+                      <button type="button" className="tt-icon-btn" title="Duplicate" disabled={busy} onClick={() => duplicate(r)}>
                         <Icon name="refresh" size={14} />
                       </button>
-                      <button type="button" className="tt-icon-btn is-danger" title="Delete" onClick={() => remove(r.id)}>
+                      <button type="button" className="tt-icon-btn is-danger" title="Delete" disabled={busy} onClick={() => remove(r)}>
                         <Icon name="x" size={14} />
                       </button>
                     </div>

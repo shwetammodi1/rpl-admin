@@ -80,3 +80,52 @@ export async function fetchMasterData(): Promise<MasterData | null> {
   if (!res.ok) return null
   return res.json<MasterData>()
 }
+
+// ---- Writes (admin only) ----
+
+export type SlotPayload = {
+  facultyId: string
+  subjectId: string
+  classroomId: string
+  day: number
+  startTime: string
+  endTime: string
+  department: string
+  course: string
+  semester: string
+  section: string
+  lectureType: string
+  status: string
+  notes: string
+  academicYear: string
+}
+
+function jsonHeaders(): Record<string, string> {
+  return { ...authHeaders(), 'Content-Type': 'application/json' }
+}
+
+export async function createSlot(payload: SlotPayload): Promise<boolean> {
+  const res = await fetch('/api/admin/timetable', {
+    method: 'POST',
+    headers: jsonHeaders(),
+    body: JSON.stringify(payload),
+  })
+  return res.ok
+}
+
+export async function updateSlot(id: string, payload: Partial<SlotPayload>): Promise<boolean> {
+  const res = await fetch(`/api/admin/timetable/${id}`, {
+    method: 'PATCH',
+    headers: jsonHeaders(),
+    body: JSON.stringify(payload),
+  })
+  return res.ok
+}
+
+export async function deleteSlot(id: string): Promise<boolean> {
+  const res = await fetch(`/api/admin/timetable/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  })
+  return res.ok
+}

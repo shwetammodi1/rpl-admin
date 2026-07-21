@@ -5316,6 +5316,20 @@ textarea:focus-visible {
   font-size: 13px;
   font-weight: 600;
 }
+.tt-flash.is-error {
+  background: var(--tint-absent-bg, #fdecea);
+  color: var(--rpl-absent);
+}
+.tt-status-btn {
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.tt-status-btn:disabled { cursor: default; opacity: 0.7; }
 
 /* ---- Timetable module (Phase 2 scaffolding) ---- */
 .tt-placeholder {
