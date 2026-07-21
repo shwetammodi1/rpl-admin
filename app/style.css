@@ -4601,6 +4601,278 @@ textarea:focus-visible {
 .provision-tag.is-updated { background: var(--tint-short-bg); color: var(--rpl-hr); }
 .provision-tag.is-kept { background: var(--rpl-navy-50); color: var(--rpl-muted); }
 
+/* ---- Timetable: subject colour tokens ---- */
+.tt-c-blue   { --tt-color: #1e7fa6; --tt-soft: #e9f2f7; }
+.tt-c-green  { --tt-color: #1f7a53; --tt-soft: #e8f5ef; }
+.tt-c-orange { --tt-color: #b27d17; --tt-soft: #fdf3e0; }
+.tt-c-pink   { --tt-color: #b8437f; --tt-soft: #fceaf3; }
+.tt-c-purple { --tt-color: #6b4fbb; --tt-soft: #efeafa; }
+.tt-c-gray   { --tt-color: #8b95a4; --tt-soft: #f1f3f6; }
+
+/* ---- Timetable dashboard (Phase 3) ---- */
+.tt-dash {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.tt-greet-title {
+  margin: 0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 20px;
+  color: var(--rpl-navy);
+}
+.tt-greet-sub {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--rpl-muted);
+}
+.tt-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.tt-chip {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--rpl-slate);
+  background: var(--rpl-navy-50);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+/* Timeline */
+.tt-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 6px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tt-tl-item {
+  display: grid;
+  grid-template-columns: 74px 14px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  position: relative;
+}
+.tt-tl-item::before {
+  content: '';
+  position: absolute;
+  left: 81px;
+  top: 22px;
+  bottom: -18px;
+  width: 1px;
+  background: var(--rpl-border);
+}
+.tt-tl-item:last-child::before { display: none; }
+.tt-tl-time {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  padding-top: 2px;
+}
+.tt-tl-start {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rpl-ink);
+}
+.tt-tl-end {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--rpl-off);
+}
+.tt-tl-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  margin-top: 6px;
+  background: var(--tt-color, var(--rpl-navy));
+  box-shadow: 0 0 0 3px var(--tt-soft, var(--rpl-navy-50));
+  position: relative;
+  z-index: 1;
+}
+.tt-tl-card {
+  border: 1px solid var(--rpl-border);
+  border-left: 3px solid var(--tt-color, var(--rpl-navy));
+  border-radius: var(--r-md);
+  padding: 10px 12px;
+  background: #fff;
+}
+.tt-tl-item.is-completed .tt-tl-card { background: var(--rpl-paper); opacity: 0.75; }
+.tt-tl-item.is-ongoing .tt-tl-card { background: var(--tt-soft); }
+.tt-tl-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.tt-tl-subject {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rpl-ink);
+}
+.tt-tl-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 5px;
+  font-size: 12px;
+  color: var(--rpl-muted);
+}
+.tt-tl-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.tt-status {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  white-space: nowrap;
+}
+.tt-status.is-completed { background: var(--tint-present-bg, #e8f5ef); color: var(--rpl-present); }
+.tt-status.is-ongoing { background: var(--rpl-gold-50); color: var(--rpl-gold); }
+.tt-status.is-upcoming { background: var(--rpl-navy-50); color: var(--rpl-slate); }
+
+/* Next lecture card */
+.tt-next-body {
+  padding: 18px 20px 20px;
+  border-top: 3px solid var(--tt-color, var(--rpl-navy));
+}
+.tt-next-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tt-color);
+  background: var(--tt-soft);
+  padding: 3px 9px;
+  border-radius: var(--r-sm);
+}
+.tt-next-subject {
+  margin: 10px 0 4px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 20px;
+  color: var(--rpl-navy);
+}
+.tt-next-time {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--rpl-ink);
+}
+.tt-next-countdown {
+  margin-top: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tt-color);
+}
+.tt-next-meta {
+  display: flex;
+  gap: 22px;
+  margin: 16px 0 18px;
+}
+.tt-next-meta dt,
+.tt-quick dt {
+  font-size: 11px;
+  color: var(--rpl-muted);
+  margin: 0;
+}
+.tt-next-meta dd,
+.tt-quick dd {
+  margin: 2px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--rpl-ink);
+}
+.tt-next-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.tt-empty {
+  padding: 28px 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--rpl-muted);
+}
+
+/* Weekly bar chart */
+.tt-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 22px 22px 18px;
+  height: 190px;
+}
+.tt-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+}
+.tt-bar-wrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.tt-bar {
+  width: 60%;
+  max-width: 34px;
+  min-height: 6px;
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+  background: linear-gradient(180deg, var(--rpl-navy-light), var(--rpl-navy));
+}
+.tt-bar-val {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rpl-ink);
+}
+.tt-bar-day {
+  font-size: 11px;
+  color: var(--rpl-muted);
+}
+
+/* Quick info */
+.tt-quick {
+  margin: 0;
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tt-quick > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px dashed var(--rpl-border);
+  padding-bottom: 10px;
+}
+.tt-quick > div:last-child { border-bottom: none; padding-bottom: 0; }
+.tt-quick dd { text-align: right; }
+
+@media (max-width: 900px) {
+  .tt-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .tt-tl-item { grid-template-columns: 62px 12px minmax(0, 1fr); }
+  .tt-tl-item::before { left: 68px; }
+}
+
 /* ---- Timetable module (Phase 2 scaffolding) ---- */
 .tt-placeholder {
   padding: 30px 28px;

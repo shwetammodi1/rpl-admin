@@ -2,6 +2,7 @@ import { createRoute } from '../../../lib/factory'
 import Sidebar from '../../../components/Sidebar'
 import Topbar from '../../../components/Topbar'
 import PageHeader from '../../../components/PageHeader'
+import TimetableDashboard from '../../../islands/TimetableDashboard'
 
 export default createRoute((c) =>
   c.render(
@@ -11,12 +12,7 @@ export default createRoute((c) =>
         <Topbar role="faculty" />
         <main className="admin-content">
           <PageHeader title="Timetable Dashboard" subtitle="Your lectures, today's schedule and weekly summary" />
-          <section className="admin-card tt-placeholder">
-            <p>
-              <strong>Phase 2 — page created.</strong> The dashboard UI (summary cards, today's
-              timeline, next-lecture card, weekly chart) is built in Phase 3.
-            </p>
-          </section>
+          <TimetableDashboard />
         </main>
       </div>
     </div>,
