@@ -25,6 +25,9 @@ export default function TimetableWeekly({ admin = false }: { admin?: boolean }) 
   const [facultyNames, setFacultyNames] = useState<string[]>([])
 
   useEffect(() => {
+    // On phones the 7-column grid is cramped, so open on the Day view instead.
+    if (typeof window !== 'undefined' && window.innerWidth < 560) setView('day')
+
     const load = admin
       ? fetchAdminSlots().then((slots) => {
           setFacultyNames([...new Set(slots.map((s) => s.faculty).filter(Boolean) as string[])])
