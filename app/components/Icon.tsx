@@ -28,6 +28,35 @@ const PATHS: Record<string, any> = {
       <path d="M10 15h4" />
     </>
   ),
+  calendar: (
+    <>
+      <rect x="3" y="4" width="18" height="17" rx="2" />
+      <path d="M3 9h18" />
+      <path d="M8 2v4" />
+      <path d="M16 2v4" />
+    </>
+  ),
+  table: (
+    <>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <path d="M3 10h18" />
+      <path d="M9 10v10" />
+      <path d="M15 10v10" />
+    </>
+  ),
+  book: (
+    <>
+      <path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H19v16H7.5A2.5 2.5 0 0 0 5 20.5z" />
+      <path d="M5 20.5A2.5 2.5 0 0 1 7.5 18H19v4H7.5" />
+    </>
+  ),
+  building: (
+    <>
+      <rect x="4" y="3" width="16" height="18" rx="1.5" />
+      <path d="M9 7h2M13 7h2M9 11h2M13 11h2" />
+      <path d="M10 21v-4h4v4" />
+    </>
+  ),
   list: (
     <>
       <path d="M8 6h13" />

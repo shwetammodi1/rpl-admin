@@ -4601,6 +4601,21 @@ textarea:focus-visible {
 .provision-tag.is-updated { background: var(--tint-short-bg); color: var(--rpl-hr); }
 .provision-tag.is-kept { background: var(--rpl-navy-50); color: var(--rpl-muted); }
 
+/* ---- Timetable module (Phase 2 scaffolding) ---- */
+.tt-placeholder {
+  padding: 30px 28px;
+}
+.tt-placeholder p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--rpl-muted);
+}
+.tt-placeholder strong {
+  color: var(--rpl-ink);
+  font-weight: 600;
+}
+
 /* ---- My Profile ---- */
 .profile-page {
   display: flex;

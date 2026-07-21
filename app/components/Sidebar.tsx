@@ -15,6 +15,14 @@ const NAV: Record<Role, NavGroup[]> = {
         { key: 'applications', href: '/dashboard/applications', label: 'My Applications', icon: 'list' },
       ],
     },
+    {
+      label: 'Timetable',
+      items: [
+        { key: 'tt-dashboard', href: '/dashboard/timetable', label: 'Dashboard', icon: 'layout-grid' },
+        { key: 'tt-weekly', href: '/dashboard/timetable/weekly', label: 'Weekly Timetable', icon: 'table' },
+        { key: 'tt-calendar', href: '/dashboard/timetable/calendar', label: 'Calendar View', icon: 'calendar' },
+      ],
+    },
   ],
   hr: [
     {
@@ -36,6 +44,17 @@ const NAV: Record<Role, NavGroup[]> = {
       items: [
         { key: 'users', href: '/master', label: 'User Access', icon: 'users' },
         { key: 'provision', href: '/master/provision', label: 'Faculty Accounts', icon: 'user-check' },
+      ],
+    },
+    {
+      label: 'Timetable',
+      items: [
+        { key: 'tt-dashboard', href: '/master/timetable', label: 'Dashboard', icon: 'layout-grid' },
+        { key: 'tt-weekly', href: '/master/timetable/weekly', label: 'Weekly Timetable', icon: 'table' },
+        { key: 'tt-calendar', href: '/master/timetable/calendar', label: 'Calendar View', icon: 'calendar' },
+        { key: 'tt-manage', href: '/master/timetable/manage', label: 'Manage Timetable', icon: 'check-square' },
+        { key: 'tt-subjects', href: '/master/timetable/subjects', label: 'Subjects', icon: 'book' },
+        { key: 'tt-classrooms', href: '/master/timetable/classrooms', label: 'Classrooms', icon: 'building' },
       ],
     },
     {
