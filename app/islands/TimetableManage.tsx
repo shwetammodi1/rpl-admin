@@ -119,14 +119,49 @@ export default function TimetableManage() {
     setOpen(true)
   }
 
-  const save = async () => {
+  // Live clash preview against the rows already loaded (server re-checks on save).
+  const liveConflicts = !open
+    ? []
+    : rows.filter((r) => {
+        if (editingId && r.id === editingId) return false
+        if (r.day !== form.day) return false
+        if (!(form.startTime < r.end_time && form.endTime > r.start_time)) return false
+        if (form.facultyId && r.faculty_id === form.facultyId) return true
+        if (form.classroomId && r.classroom_id === form.classroomId) return true
+        return (
+          !!form.course && !!form.semester && !!form.section &&
+          r.course === form.course && r.semester === form.semester && r.section === form.section
+        )
+      })
+
+  const conflictKind = (r: AdminSlot) =>
+    form.facultyId && r.faculty_id === form.facultyId
+      ? 'Faculty busy'
+      : form.classroomId && r.classroom_id === form.classroomId
+        ? 'Room occupied'
+        : 'Class already has a lecture'
+
+  const save = async (force = false) => {
+    if (form.startTime >= form.endTime) return fail('End time must be after start time.')
     setBusy(true)
-    const ok = editingId ? await updateSlot(editingId, form) : await createSlot(form)
-    if (ok) {
+    const res = editingId
+      ? await updateSlot(editingId, { ...form, force })
+      : await createSlot({ ...form, force })
+
+    if (res.ok) {
       await reload()
       flash(editingId ? 'Lecture updated.' : 'Lecture added.')
       setOpen(false)
       setEditingId(null)
+    } else if (res.conflicts?.length) {
+      const lines = res.conflicts
+        .map((x) => `• ${x.kind === 'faculty' ? 'Faculty' : x.kind === 'room' ? 'Room' : 'Class'} clash — ${x.subject ?? 'lecture'} ${fmt12(x.start)}–${fmt12(x.end)} (${x.faculty ?? ''} ${x.room ?? ''} ${x.klass})`)
+        .join('\n')
+      if (confirm(`Conflict detected:\n\n${lines}\n\nSave anyway?`)) {
+        setBusy(false)
+        return save(true)
+      }
+      fail(`${res.conflicts.length} conflict(s) — not saved.`)
     } else {
       fail('Could not save — please try again.')
     }
@@ -348,8 +383,25 @@ export default function TimetableManage() {
               <input value={form.notes} onInput={(e) => set('notes', (e.target as HTMLInputElement).value)} placeholder="Optional note for this lecture" />
             </label>
           </div>
+          {liveConflicts.length > 0 && (
+            <div className="tt-conflict">
+              <div className="tt-conflict-head">
+                <Icon name="alert" size={15} /> {liveConflicts.length} conflict{liveConflicts.length > 1 ? 's' : ''} detected
+              </div>
+              <ul>
+                {liveConflicts.map((r) => (
+                  <li key={r.id}>
+                    <strong>{conflictKind(r)}</strong> — {r.subject ?? 'Lecture'} · {fmt12(r.start_time)}–{fmt12(r.end_time)}
+                    {r.faculty ? ` · ${r.faculty}` : ''}{r.room ? ` · ${r.room}` : ''}
+                    {[r.course, r.semester, r.section].filter(Boolean).length ? ` · ${[r.course, r.semester, r.section].filter(Boolean).join(' ')}` : ''}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="tt-form-actions">
-            <button type="button" className="btn-primary" disabled={busy} onClick={save}>
+            <button type="button" className="btn-primary" disabled={busy} onClick={() => save()}>
               <Icon name="check" size={15} /> {busy ? 'Saving…' : editingId ? 'Update Lecture' : 'Save Lecture'}
             </button>
             <button type="button" className="tt-today-btn" onClick={() => setOpen(false)}>Cancel</button>

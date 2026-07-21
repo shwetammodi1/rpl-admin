@@ -5320,6 +5320,31 @@ textarea:focus-visible {
   background: var(--tint-absent-bg, #fdecea);
   color: var(--rpl-absent);
 }
+.tt-conflict {
+  margin: 4px 18px 0;
+  padding: 12px 14px;
+  border: 1px solid #f3c9c3;
+  border-left: 3px solid var(--rpl-absent);
+  border-radius: var(--r-md);
+  background: var(--tint-absent-bg, #fdecea);
+}
+.tt-conflict-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--rpl-absent);
+}
+.tt-conflict ul {
+  margin: 7px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tt-conflict li { font-size: 12.5px; color: var(--rpl-ink); }
+
 .tt-status-btn {
   border: none;
   cursor: pointer;

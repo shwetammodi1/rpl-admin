@@ -1,5 +1,6 @@
 import { createRoute } from '../../../../lib/factory'
 import { verifyJWT, requireRole } from '../../../../lib/jwt'
+import { findConflicts } from '../../../../lib/timetableConflicts'
 
 // Editable columns, mapped from the JSON body key to the DB column.
 const FIELDS: Record<string, string> = {
@@ -23,6 +24,39 @@ export const PATCH = createRoute(verifyJWT, requireRole('master'), async (c) => 
   const id = c.req.param('id')
   const body = (await c.req.json().catch(() => null)) as Record<string, unknown> | null
   if (!body) return c.json({ error: 'Invalid body' }, 400)
+
+  // Clash check against the row as it will look after this update.
+  if (!body.force) {
+    const current = await c.env.DB.prepare(
+      `SELECT day, start_time, end_time, faculty_id, classroom_id, course, semester, section
+         FROM timetable_slots WHERE id = ?`
+    )
+      .bind(id)
+      .first<{
+        day: number; start_time: string; end_time: string
+        faculty_id: string | null; classroom_id: string | null
+        course: string | null; semester: string | null; section: string | null
+      }>()
+
+    if (current) {
+      const pick = <T,>(key: string, fallback: T) => (key in body ? (body[key] as T) : fallback)
+      const conflicts = await findConflicts(
+        c.env.DB,
+        {
+          day: pick('day', current.day),
+          startTime: pick('startTime', current.start_time),
+          endTime: pick('endTime', current.end_time),
+          facultyId: pick('facultyId', current.faculty_id),
+          classroomId: pick('classroomId', current.classroom_id),
+          course: pick('course', current.course),
+          semester: pick('semester', current.semester),
+          section: pick('section', current.section),
+        },
+        id
+      )
+      if (conflicts.length) return c.json({ error: 'Conflict detected', conflicts }, 409)
+    }
+  }
 
   const sets: string[] = []
   const vals: unknown[] = []

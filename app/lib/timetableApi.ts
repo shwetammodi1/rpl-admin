@@ -104,22 +104,46 @@ function jsonHeaders(): Record<string, string> {
   return { ...authHeaders(), 'Content-Type': 'application/json' }
 }
 
-export async function createSlot(payload: SlotPayload): Promise<boolean> {
+export type ServerConflict = {
+  id: string
+  kind: 'faculty' | 'room' | 'section'
+  subject: string | null
+  faculty: string | null
+  room: string | null
+  start: string
+  end: string
+  klass: string
+}
+
+export type SaveResult = { ok: boolean; conflicts?: ServerConflict[] }
+
+export async function createSlot(payload: SlotPayload & { force?: boolean }): Promise<SaveResult> {
   const res = await fetch('/api/admin/timetable', {
     method: 'POST',
     headers: jsonHeaders(),
     body: JSON.stringify(payload),
   })
-  return res.ok
+  if (res.status === 409) {
+    const d = await res.json<{ conflicts: ServerConflict[] }>().catch(() => ({ conflicts: [] }))
+    return { ok: false, conflicts: d.conflicts ?? [] }
+  }
+  return { ok: res.ok }
 }
 
-export async function updateSlot(id: string, payload: Partial<SlotPayload>): Promise<boolean> {
+export async function updateSlot(
+  id: string,
+  payload: Partial<SlotPayload> & { force?: boolean }
+): Promise<SaveResult> {
   const res = await fetch(`/api/admin/timetable/${id}`, {
     method: 'PATCH',
     headers: jsonHeaders(),
     body: JSON.stringify(payload),
   })
-  return res.ok
+  if (res.status === 409) {
+    const d = await res.json<{ conflicts: ServerConflict[] }>().catch(() => ({ conflicts: [] }))
+    return { ok: false, conflicts: d.conflicts ?? [] }
+  }
+  return { ok: res.ok }
 }
 
 export async function deleteSlot(id: string): Promise<boolean> {

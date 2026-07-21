@@ -1,5 +1,6 @@
 import { createRoute } from '../../../../lib/factory'
 import { verifyJWT, requireRole } from '../../../../lib/jwt'
+import { findConflicts } from '../../../../lib/timetableConflicts'
 
 // College-wide timetable for admins. Optional filters: facultyId, day,
 // department, status. Phase 8 adds POST/PATCH/DELETE here.
@@ -52,6 +53,7 @@ type SlotBody = {
   status?: string
   notes?: string
   academicYear?: string
+  force?: boolean
 }
 
 // Create a lecture slot.
@@ -59,6 +61,23 @@ export const POST = createRoute(verifyJWT, requireRole('master'), async (c) => {
   const b = (await c.req.json().catch(() => null)) as SlotBody | null
   if (!b || !b.day || !b.startTime || !b.endTime) {
     return c.json({ error: 'day, startTime and endTime are required' }, 400)
+  }
+
+  // Clash check — same faculty / room / class at an overlapping time.
+  if (!b.force) {
+    const conflicts = await findConflicts(c.env.DB, {
+      day: b.day,
+      startTime: b.startTime,
+      endTime: b.endTime,
+      facultyId: b.facultyId,
+      classroomId: b.classroomId,
+      course: b.course,
+      semester: b.semester,
+      section: b.section,
+    })
+    if (conflicts.length) {
+      return c.json({ error: 'Conflict detected', conflicts }, 409)
+    }
   }
 
   const id = crypto.randomUUID()
