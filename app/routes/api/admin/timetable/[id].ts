@@ -19,7 +19,7 @@ const FIELDS: Record<string, string> = {
   academicYear: 'academic_year',
 }
 
-export const PATCH = createRoute(verifyJWT, requireRole('hr', 'master'), async (c) => {
+export const PATCH = createRoute(verifyJWT, requireRole('master'), async (c) => {
   const id = c.req.param('id')
   const body = (await c.req.json().catch(() => null)) as Record<string, unknown> | null
   if (!body) return c.json({ error: 'Invalid body' }, 400)
@@ -45,7 +45,7 @@ export const PATCH = createRoute(verifyJWT, requireRole('hr', 'master'), async (
   return c.json({ ok: true })
 })
 
-export const DELETE = createRoute(verifyJWT, requireRole('hr', 'master'), async (c) => {
+export const DELETE = createRoute(verifyJWT, requireRole('master'), async (c) => {
   const id = c.req.param('id')
   await c.env.DB.prepare('DELETE FROM timetable_slots WHERE id = ?').bind(id).run()
   return c.json({ ok: true })

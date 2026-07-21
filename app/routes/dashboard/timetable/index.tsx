@@ -2,6 +2,7 @@ import { createRoute } from '../../../lib/factory'
 import Sidebar from '../../../components/Sidebar'
 import Topbar from '../../../components/Topbar'
 import PageHeader from '../../../components/PageHeader'
+import AuthGuard from '../../../islands/AuthGuard'
 import TimetableDashboard from '../../../islands/TimetableDashboard'
 
 export default createRoute((c) =>
@@ -15,6 +16,7 @@ export default createRoute((c) =>
           <TimetableDashboard />
         </main>
       </div>
+      <AuthGuard allowedRoles={['faculty']} />
     </div>,
     { title: 'Timetable Dashboard - RPL Maheshwari College' }
   )

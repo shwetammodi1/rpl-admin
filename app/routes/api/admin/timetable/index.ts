@@ -55,7 +55,7 @@ type SlotBody = {
 }
 
 // Create a lecture slot.
-export const POST = createRoute(verifyJWT, requireRole('hr', 'master'), async (c) => {
+export const POST = createRoute(verifyJWT, requireRole('master'), async (c) => {
   const b = (await c.req.json().catch(() => null)) as SlotBody | null
   if (!b || !b.day || !b.startTime || !b.endTime) {
     return c.json({ error: 'day, startTime and endTime are required' }, 400)
