@@ -20,10 +20,10 @@ import {
 
 // column -> accepted incoming key names (first match wins)
 const FIELD_MAP: Record<string, string[]> = {
-  user_id: ['UserID', 'userId', 'UserId', 'userid', 'user_id'],
-  punch_time: ['PunchTime', 'punchTime', 'punch_time'],
-  inserted_on: ['InsertedOn', 'insertedOn', 'inserted_on'],
-  device_id: ['DeviceID', 'DeviceId', 'deviceId', 'deviceid', 'device_id'],
+  user_id: ['UserID', 'userId', 'UserId', 'userid', 'user_id', 'employeeID', 'EmployeeID', 'employeeId', 'empId', 'EmpID'],
+  punch_time: ['PunchTime', 'punchTime', 'punch_time', 'time', 'Time'],
+  inserted_on: ['InsertedOn', 'insertedOn', 'inserted_on', 'date', 'Date'],
+  device_id: ['DeviceID', 'DeviceId', 'deviceId', 'deviceid', 'device_id', 'deviceSerialno', 'DeviceSerialno', 'DeviceSerialNo', 'deviceSerial'],
   device_name: ['DeviceName', 'deviceName', 'device_name'],
   in_out_mode: ['InOutMode', 'inOutMode', 'in_out_mode'],
   verify_mode: ['VerifyMode', 'verifyMode', 'verify_mode'],
@@ -49,93 +49,126 @@ function str(v: unknown): string | null {
   return typeof v === 'object' ? JSON.stringify(v) : String(v)
 }
 
+// TimeWatch (and similar biometric push devices) expect a bare "OK" reply with
+// Content-Type: text/plain. A JSON body can make the device treat the push as
+// failed and retry forever, so this endpoint ALWAYS answers 200 / text/plain / OK —
+// even on a parse error or DB failure. Storage is best-effort; the reply never changes.
 export const POST = createRoute(async (c) => {
   const authHeader = c.req.header('Authorization')
   const deviceKey = c.req.header('X-Device-Key') ?? ''
   const contentType = c.req.header('Content-Type')
 
-  const raw = await c.req.text()
-  const parsed = parseIncoming(raw, contentType)
-  let records = toRecords(parsed)
-
-  const topDeviceId = pickDeviceId(parsed as Record<string, unknown>)
-  const authDeviceId = topDeviceId || (records[0] ? pickDeviceId(records[0]) : '')
-
-  const viaBasic = checkBasicAuth(c.env, authHeader)
-  const viaDevice = !viaBasic && (await authenticateDevice(c.env.DB, authDeviceId, deviceKey))
-
-  // Always keep the raw request for inspection.
-  const debugStr = `${c.req.method} ${c.req.url}\nct=${contentType ?? ''} len=${c.req.header('content-length') ?? '0'}\nbody=${raw}`
-  await captureDebug(c.env.DB, 'timewatch', contentType, viaBasic || viaDevice, debugStr)
-
-  // NOTE: authentication intentionally NOT enforced — this endpoint accepts
-  // requests without credentials (public). viaBasic/viaDevice are kept for logging only.
-
-  // Even a blank/empty hit stores one row — every hit to the API is recorded.
-  if (records.length === 0) {
-    records = [parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : {}]
+  let raw = ''
+  try {
+    raw = await c.req.text()
+  } catch {
+    /* unreadable body — still answer OK below */
   }
 
-  const createdAt = Date.now()
-  const stored: Record<string, unknown>[] = []
+  // --- Full request log (method, content-type, all headers, raw body, parsed) ---
+  const headers: Record<string, string> = {}
+  c.req.raw.headers.forEach((v, k) => {
+    headers[k] = k.toLowerCase() === 'authorization' ? '***' : v
+  })
+  let parsed: Record<string, unknown> = {}
+  try {
+    parsed = parseIncoming(raw, contentType)
+  } catch (e) {
+    console.log(`⚠️ [timewatch] parse failed: ${(e as Error)?.message}`)
+  }
+  console.log(
+    `📥 [timewatch] ${c.req.method} ct="${contentType ?? ''}" ` +
+      `headers=${JSON.stringify(headers)} rawBody=${JSON.stringify(raw)} ` +
+      `parsed=${JSON.stringify(parsed)}`
+  )
 
-  for (const rec of records) {
-    const id = crypto.randomUUID()
+  // Storage is best-effort — a failure here must NEVER change the OK response.
+  try {
+    let records = toRecords(parsed)
 
-    // map known fields to columns
-    const cols: Record<string, string | null> = {}
-    for (const [col, keys] of Object.entries(FIELD_MAP)) {
-      cols[col] = str(pickField(rec, keys))
+    const topDeviceId = pickDeviceId(parsed)
+    const authDeviceId = topDeviceId || (records[0] ? pickDeviceId(records[0]) : '')
+
+    const viaBasic = checkBasicAuth(c.env, authHeader)
+    const viaDevice = !viaBasic && (await authenticateDevice(c.env.DB, authDeviceId, deviceKey))
+
+    // Always keep the raw request for inspection.
+    const debugStr = `${c.req.method} ${c.req.url}\nct=${contentType ?? ''} len=${c.req.header('content-length') ?? '0'}\nbody=${raw}`
+    await captureDebug(c.env.DB, 'timewatch', contentType, viaBasic || viaDevice, debugStr)
+
+    // NOTE: authentication intentionally NOT enforced — this endpoint accepts
+    // requests without credentials (public). viaBasic/viaDevice are kept for logging only.
+
+    // Even a blank/empty hit stores one row — every hit to the API is recorded.
+    if (records.length === 0) {
+      records = [parsed && typeof parsed === 'object' ? parsed : {}]
     }
 
-    // any key we don't have a column for → the 5 extra columns (rest still in raw_json)
-    const extras: string[] = []
-    for (const [k, v] of Object.entries(rec)) {
-      if (!KNOWN.has(k.toLowerCase())) extras.push(`${k}=${str(v) ?? ''}`)
-    }
+    const createdAt = Date.now()
+    let count = 0
 
-    await c.env.DB.prepare(
-      `INSERT INTO timewatch_data
-         (id, user_id, punch_time, inserted_on, device_id, device_name, in_out_mode, verify_mode,
-          from_date, to_date, extra1, extra2, extra3, extra4, extra5, raw_json, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    )
-      .bind(
-        id,
-        cols.user_id,
-        cols.punch_time,
-        cols.inserted_on,
-        cols.device_id,
-        cols.device_name,
-        cols.in_out_mode,
-        cols.verify_mode,
-        cols.from_date,
-        cols.to_date,
-        extras[0] ?? null,
-        extras[1] ?? null,
-        extras[2] ?? null,
-        extras[3] ?? null,
-        extras[4] ?? null,
-        Object.keys(rec).length ? JSON.stringify(rec) : raw || '{}',
-        createdAt
-      )
-      .run()
+    for (const rec of records) {
+      const id = crypto.randomUUID()
 
-    // Best-effort: if it's a real punch (has PunchTime + UserID), also feed the
-    // attendance pipeline (biometric_punches). Never let this break the main store.
-    const ms = parsePunchTime(cols.punch_time)
-    if (cols.user_id && ms != null) {
-      try {
-        const internal = await ensureDevice(c.env.DB, cols.device_id || topDeviceId || authDeviceId || id)
-        await ingestPunch(c.env.DB, internal, cols.user_id, ms, normalizeDirection(cols.in_out_mode))
-      } catch {
-        /* ignore — raw_json already stored */
+      // map known fields to columns
+      const cols: Record<string, string | null> = {}
+      for (const [col, keys] of Object.entries(FIELD_MAP)) {
+        cols[col] = str(pickField(rec, keys))
       }
+
+      // any key we don't have a column for → the 5 extra columns (rest still in raw_json)
+      const extras: string[] = []
+      for (const [k, v] of Object.entries(rec)) {
+        if (!KNOWN.has(k.toLowerCase())) extras.push(`${k}=${str(v) ?? ''}`)
+      }
+
+      await c.env.DB.prepare(
+        `INSERT INTO timewatch_data
+           (id, user_id, punch_time, inserted_on, device_id, device_name, in_out_mode, verify_mode,
+            from_date, to_date, extra1, extra2, extra3, extra4, extra5, raw_json, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+        .bind(
+          id,
+          cols.user_id,
+          cols.punch_time,
+          cols.inserted_on,
+          cols.device_id,
+          cols.device_name,
+          cols.in_out_mode,
+          cols.verify_mode,
+          cols.from_date,
+          cols.to_date,
+          extras[0] ?? null,
+          extras[1] ?? null,
+          extras[2] ?? null,
+          extras[3] ?? null,
+          extras[4] ?? null,
+          Object.keys(rec).length ? JSON.stringify(rec) : raw || '{}',
+          createdAt
+        )
+        .run()
+
+      // Best-effort: if it's a real punch (has PunchTime + UserID), also feed the
+      // attendance pipeline (biometric_punches). Never let this break the main store.
+      const ms = parsePunchTime(cols.punch_time)
+      if (cols.user_id && ms != null) {
+        try {
+          const internal = await ensureDevice(c.env.DB, cols.device_id || topDeviceId || authDeviceId || id)
+          await ingestPunch(c.env.DB, internal, cols.user_id, ms, normalizeDirection(cols.in_out_mode))
+        } catch {
+          /* ignore — raw_json already stored */
+        }
+      }
+
+      count++
     }
 
-    stored.push({ id, ...rec })
+    console.log(`🧾 [timewatch] stored ${count} row(s)`)
+  } catch (e) {
+    console.error(`❌ [timewatch] store failed (still returning OK): ${(e as Error)?.message}`)
   }
 
-  console.log(`🧾 [timewatch] stored ${stored.length} row(s), auth=${viaBasic ? 'basic' : 'device-key'}`)
-  return c.json({ Success: true, Message: 'Stored.', Data: stored })
+  // Bare "OK" — text/plain, 200. c.text() sets both by default.
+  return c.text('OK')
 })
