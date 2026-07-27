@@ -37,6 +37,13 @@ const NAV: Record<Role, NavGroup[]> = {
         { key: 'import', href: '/hr/import', label: 'Import Attendance', icon: 'download' },
       ],
     },
+    {
+      label: 'Timetable',
+      items: [
+        { key: 'tt-weekly', href: '/hr/timetable/weekly', label: 'Weekly Timetable', icon: 'table' },
+        { key: 'tt-calendar', href: '/hr/timetable/calendar', label: 'Calendar View', icon: 'calendar' },
+      ],
+    },
   ],
   master: [
     {
