@@ -40,6 +40,7 @@ function authHeaders(): Record<string, string> {
 /** Map a DB row to the Lecture shape the UI components render. */
 export function toLecture(r: AdminSlot): Lecture {
   return {
+    id: r.id,
     day: r.day,
     start: r.start_time,
     end: r.end_time,

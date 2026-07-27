@@ -9,8 +9,10 @@ import {
   fmt12,
   mondayOf,
   fmtDate,
+  ymd,
 } from '../lib/timetable'
 import { fetchAdminSlots, fetchMyTimetable, toLecture } from '../lib/timetableApi'
+import LectureLogForm from './LectureLogForm'
 
 // PHASE 7 — now loads real data. Faculty see their own published timetable;
 // admins see the college-wide slots. `admin` also shows the extra filters.
@@ -20,9 +22,10 @@ export default function TimetableWeekly({ admin = false }: { admin?: boolean }) 
   const [weekOffset, setWeekOffset] = useState(0)
   const [dayIdx, setDayIdx] = useState(() => ((new Date().getDay() + 6) % 7) + 1)
   const [selected, setSelected] = useState<Lecture | null>(null)
-  const [LECTURES, setLectures] = useState<Lecture[]>([])
+  const [allLectures, setAllLectures] = useState<Lecture[]>([])
   const [loading, setLoading] = useState(true)
   const [facultyNames, setFacultyNames] = useState<string[]>([])
+  const [facultyFilter, setFacultyFilter] = useState('')
 
   useEffect(() => {
     // On phones the 7-column grid is cramped, so open on the Day view instead.
@@ -35,10 +38,13 @@ export default function TimetableWeekly({ admin = false }: { admin?: boolean }) 
         })
       : fetchMyTimetable()
     load
-      .then(setLectures)
-      .catch(() => setLectures([]))
+      .then(setAllLectures)
+      .catch(() => setAllLectures([]))
       .finally(() => setLoading(false))
   }, [])
+
+  // Admin can narrow the grid to one faculty; faculty always see only their own.
+  const LECTURES = facultyFilter ? allLectures.filter((l) => l.faculty === facultyFilter) : allLectures
 
   const monday = mondayOf(weekOffset)
   const sunday = new Date(monday)
@@ -84,6 +90,14 @@ export default function TimetableWeekly({ admin = false }: { admin?: boolean }) 
   const dayLectures = LECTURES.filter((l) => l.day === dayIdx).sort((a, b) => a.start.localeCompare(b.start))
   const allSorted = LECTURES.slice().sort((a, b) => a.day - b.day || a.start.localeCompare(b.start))
 
+  // Date of the selected lecture within the currently displayed week.
+  const selectedDate = (() => {
+    if (!selected) return ''
+    const d = new Date(monday)
+    d.setDate(d.getDate() + (selected.day - 1))
+    return ymd(d)
+  })()
+
   return (
     <div className="tt-week">
       {/* Toolbar */}
@@ -91,8 +105,8 @@ export default function TimetableWeekly({ admin = false }: { admin?: boolean }) 
         {admin && (
           <label className="tt-tb-field">
             <span>Faculty</span>
-            <select>
-              <option>All Faculty</option>
+            <select value={facultyFilter} onChange={(e) => setFacultyFilter((e.target as HTMLSelectElement).value)}>
+              <option value="">All Faculty</option>
               {facultyNames.map((f) => <option key={f}>{f}</option>)}
             </select>
           </label>
@@ -283,10 +297,7 @@ export default function TimetableWeekly({ admin = false }: { admin?: boolean }) 
                 </dd>
               </div>
             </dl>
-            <div className="tt-modal-actions">
-              <button type="button" className="btn-primary"><Icon name="check-square" size={15} /> Take Attendance</button>
-              <button type="button" className="btn-gold"><Icon name="users" size={15} /> View Students</button>
-            </div>
+            <LectureLogForm slotId={selected.id} date={selectedDate} editable={!admin} />
           </div>
         </div>
       )}

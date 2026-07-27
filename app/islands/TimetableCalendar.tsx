@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'hono/jsx'
 import Icon from '../components/Icon'
 import { fetchAdminSlots, fetchMyTimetable, toLecture } from '../lib/timetableApi'
+import LectureLogForm from './LectureLogForm'
 import {
   type Lecture,
   DAYS,
@@ -12,6 +13,7 @@ import {
   weekdayOf,
   dayKind,
   mondayOf,
+  ymd,
 } from '../lib/timetable'
 
 // PHASE 5 — UI only. Events are derived from the shared dummy weekly pattern
@@ -26,12 +28,21 @@ export default function TimetableCalendar({ admin = false }: { admin?: boolean }
   const [weekOffset, setWeekOffset] = useState(0)
   const [selected, setSelected] = useState<{ lecture: Lecture; date: Date } | null>(null)
   const [expanded, setExpanded] = useState<Date | null>(null)
-  const [lectures, setLectures] = useState<Lecture[]>([])
+  const [allLectures, setAllLectures] = useState<Lecture[]>([])
+  const [facultyNames, setFacultyNames] = useState<string[]>([])
+  const [facultyFilter, setFacultyFilter] = useState('')
 
   useEffect(() => {
     const load = admin ? fetchAdminSlots().then((s) => s.map(toLecture)) : fetchMyTimetable()
-    load.then(setLectures).catch(() => setLectures([]))
+    load
+      .then((ls) => {
+        setAllLectures(ls)
+        if (admin) setFacultyNames([...new Set(ls.map((l) => l.faculty).filter(Boolean))])
+      })
+      .catch(() => setAllLectures([]))
   }, [])
+
+  const lectures = facultyFilter ? allLectures.filter((l) => l.faculty === facultyFilter) : allLectures
 
   // ---- month grid (6 weeks, Monday-first) ----
   const year = cursor.getFullYear()
@@ -95,7 +106,10 @@ export default function TimetableCalendar({ admin = false }: { admin?: boolean }
         {admin && (
           <label className="tt-tb-field">
             <span>Faculty</span>
-            <select><option>All Faculty</option><option selected>Devendra Nagwanshi</option></select>
+            <select value={facultyFilter} onChange={(e) => setFacultyFilter((e.target as HTMLSelectElement).value)}>
+              <option value="">All Faculty</option>
+              {facultyNames.map((f) => <option key={f}>{f}</option>)}
+            </select>
           </label>
         )}
         <div className="tt-tb-week">
@@ -229,10 +243,7 @@ export default function TimetableCalendar({ admin = false }: { admin?: boolean }
                 </dd>
               </div>
             </dl>
-            <div className="tt-modal-actions">
-              <button type="button" className="btn-primary"><Icon name="check-square" size={15} /> Take Attendance</button>
-              <button type="button" className="btn-gold"><Icon name="users" size={15} /> View Students</button>
-            </div>
+            <LectureLogForm slotId={selected.lecture.id} date={ymd(selected.date)} editable={!admin} />
           </div>
         </div>
       )}

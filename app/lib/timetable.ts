@@ -3,6 +3,7 @@
 // with the real API while these types/utils stay unchanged.
 
 export type Lecture = {
+  id?: string // timetable_slots.id (present for real data; used to log a lecture)
   day: number // 1 = Mon … 7 = Sun
   start: string
   end: string
@@ -130,6 +131,11 @@ export function mondayOf(offset: number) {
 
 export function fmtDate(d: Date) {
   return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
+}
+
+/** Local date as 'YYYY-MM-DD' (no timezone shift). */
+export function ymd(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 export function isSameDay(a: Date, b: Date) {
