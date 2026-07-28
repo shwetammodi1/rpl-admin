@@ -17,7 +17,7 @@ export const GET = createRoute(verifyJWT, async (c) => {
   if (!slotId || !date) return c.json({ error: 'slotId and date are required' }, 400)
 
   const log = await c.env.DB.prepare(
-    `SELECT id, slot_id, log_date, status, present_count, total_count, topic, remarks
+    `SELECT id, slot_id, log_date, status, present_count, total_count, topic, remarks, present_students
        FROM lecture_logs WHERE slot_id = ? AND log_date = ?`
   )
     .bind(slotId, date)
@@ -37,6 +37,7 @@ export const POST = createRoute(verifyJWT, async (c) => {
     totalCount?: number | null
     topic?: string
     remarks?: string
+    presentStudents?: string
   } | null
 
   if (!b?.slotId || !b?.date) return c.json({ error: 'slotId and date are required' }, 400)
@@ -46,14 +47,15 @@ export const POST = createRoute(verifyJWT, async (c) => {
 
   const status = b.status === 'cancelled' ? 'cancelled' : 'conducted'
   await c.env.DB.prepare(
-    `INSERT INTO lecture_logs (id, slot_id, faculty_id, log_date, status, present_count, total_count, topic, remarks)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO lecture_logs (id, slot_id, faculty_id, log_date, status, present_count, total_count, topic, remarks, present_students)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(slot_id, log_date) DO UPDATE SET
        status = excluded.status,
        present_count = excluded.present_count,
        total_count = excluded.total_count,
        topic = excluded.topic,
        remarks = excluded.remarks,
+       present_students = excluded.present_students,
        updated_at = strftime('%s','now') * 1000`
   )
     .bind(
@@ -65,7 +67,8 @@ export const POST = createRoute(verifyJWT, async (c) => {
       b.presentCount ?? null,
       b.totalCount ?? null,
       b.topic ?? null,
-      b.remarks ?? null
+      b.remarks ?? null,
+      b.presentStudents ?? null
     )
     .run()
 

@@ -5422,6 +5422,44 @@ textarea:focus-visible {
 .tt-log-ro dt { margin: 0; font-size: 11px; color: var(--rpl-muted); }
 .tt-log-ro dd { margin: 2px 0 0; font-size: 13px; font-weight: 600; color: var(--rpl-ink); }
 .tt-log-empty { margin: 0; font-size: 12.5px; color: var(--rpl-muted); }
+.tt-log-ro-wide { grid-column: 1 / -1; }
+
+/* Present-students chips */
+.tt-student-add { display: flex; gap: 8px; }
+.tt-student-add input { flex: 1; }
+.tt-student-add .tt-today-btn { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.tt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.tt-chip-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--rpl-navy-50);
+  color: var(--rpl-ink);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.tt-chip-name.is-removable { padding-right: 5px; }
+.tt-chip-name button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(12, 35, 64, 0.12);
+  color: var(--rpl-slate);
+  cursor: pointer;
+  padding: 0;
+}
+.tt-chip-name button:hover { background: var(--rpl-absent); color: #fff; }
 @media (max-width: 560px) {
   .tt-log-row { grid-template-columns: 1fr 1fr; }
   .tt-log-pct { grid-column: 1 / -1; }

@@ -10,6 +10,7 @@ type Log = {
   total_count: number | null
   topic: string | null
   remarks: string | null
+  present_students: string | null
 }
 
 function authHeaders(): Record<string, string> {
@@ -34,6 +35,8 @@ export default function LectureLogForm({
   const [total, setTotal] = useState('')
   const [topic, setTopic] = useState('')
   const [remarks, setRemarks] = useState('')
+  const [students, setStudents] = useState<string[]>([])
+  const [studentInput, setStudentInput] = useState('')
   const [existing, setExisting] = useState(false)
 
   useEffect(() => {
@@ -52,11 +55,37 @@ export default function LectureLogForm({
           setTotal(l.total_count != null ? String(l.total_count) : '')
           setTopic(l.topic ?? '')
           setRemarks(l.remarks ?? '')
+          setStudents(
+            (l.present_students ?? '')
+              .split('\n')
+              .map((s) => s.trim())
+              .filter(Boolean)
+          )
         }
       })
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
+
+  const addStudents = () => {
+    // Accept one name, or several separated by comma / newline.
+    const names = studentInput
+      .split(/[,\n]/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+    if (names.length === 0) return
+    const merged = [...students]
+    for (const n of names) if (!merged.some((x) => x.toLowerCase() === n.toLowerCase())) merged.push(n)
+    setStudents(merged)
+    setPresent(String(merged.length))
+    setStudentInput('')
+  }
+
+  const removeStudent = (name: string) => {
+    const next = students.filter((s) => s !== name)
+    setStudents(next)
+    setPresent(String(next.length))
+  }
 
   const save = async () => {
     if (!slotId) return
@@ -74,6 +103,7 @@ export default function LectureLogForm({
           totalCount: total === '' ? null : Number(total),
           topic,
           remarks,
+          presentStudents: students.join('\n'),
         }),
       })
       if (res.ok) {
@@ -111,6 +141,16 @@ export default function LectureLogForm({
             <div><dt>Attendance</dt><dd>{present || '—'} / {total || '—'}{pct != null ? ` (${pct}%)` : ''}</dd></div>
             <div><dt>Topic</dt><dd>{topic || '—'}</dd></div>
             {remarks && <div><dt>Remarks</dt><dd>{remarks}</dd></div>}
+            {students.length > 0 && (
+              <div class="tt-log-ro-wide">
+                <dt>Present Students ({students.length})</dt>
+                <dd>
+                  <div className="tt-chips">
+                    {students.map((s) => <span className="tt-chip-name" key={s}>{s}</span>)}
+                  </div>
+                </dd>
+              </div>
+            )}
           </dl>
         ) : (
           <p className="tt-log-empty">No log recorded for this date.</p>
@@ -145,6 +185,38 @@ export default function LectureLogForm({
             onInput={(e) => setTotal((e.target as HTMLInputElement).value)} />
         </label>
         <div className="tt-log-pct">{pct != null ? `${pct}%` : '—'}</div>
+      </div>
+
+      <div className="tt-tb-field">
+        <span>Present Students {students.length > 0 ? `(${students.length})` : ''}</span>
+        <div className="tt-student-add">
+          <input
+            value={studentInput}
+            placeholder="Type a student's name and press Enter"
+            onInput={(e) => setStudentInput((e.target as HTMLInputElement).value)}
+            onKeyDown={(e) => {
+              if ((e as KeyboardEvent).key === 'Enter') {
+                e.preventDefault()
+                addStudents()
+              }
+            }}
+          />
+          <button type="button" className="tt-today-btn" onClick={addStudents}>
+            <Icon name="check" size={14} /> Add
+          </button>
+        </div>
+        {students.length > 0 && (
+          <div className="tt-chips">
+            {students.map((s) => (
+              <span className="tt-chip-name is-removable" key={s}>
+                {s}
+                <button type="button" onClick={() => removeStudent(s)} aria-label={`Remove ${s}`}>
+                  <Icon name="x" size={11} />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <label className="tt-tb-field">
