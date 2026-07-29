@@ -16,7 +16,7 @@ import {
   SLOTS,
   DEPARTMENTS,
   COURSES,
-  SEMESTERS,
+  YEARS,
   SECTIONS,
   LECTURE_TYPES,
   ACADEMIC_YEARS,
@@ -35,7 +35,7 @@ const BLANK: SlotPayload = {
   endTime: '10:00',
   department: DEPARTMENTS[0],
   course: COURSES[0],
-  semester: SEMESTERS[2],
+  semester: YEARS[1],
   section: 'A',
   lectureType: LECTURE_TYPES[0],
   status: 'draft',
@@ -337,9 +337,9 @@ export default function TimetableManage() {
               </select>
             </label>
             <label className="tt-tb-field">
-              <span>Semester</span>
+              <span>Year</span>
               <select value={form.semester} onChange={(e) => set('semester', (e.target as HTMLSelectElement).value)}>
-                {SEMESTERS.map((d) => <option key={d}>{d}</option>)}
+                {YEARS.map((d) => <option key={d}>{d}</option>)}
               </select>
             </label>
             <label className="tt-tb-field">

@@ -5460,6 +5460,89 @@ textarea:focus-visible {
   padding: 0;
 }
 .tt-chip-name button:hover { background: var(--rpl-absent); color: #fff; }
+
+/* Roster one-click attendance */
+.tt-log-count {
+  padding: 8px 10px;
+  border: 1px solid var(--rpl-border);
+  border-radius: var(--r-md);
+  background: var(--rpl-navy-50);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--rpl-ink);
+  text-align: center;
+}
+.tt-roster-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.tt-roster-acts { display: inline-flex; gap: 6px; margin-left: auto; }
+.tt-mini-btn {
+  padding: 3px 9px;
+  border: 1px solid var(--rpl-border);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--rpl-slate);
+  cursor: pointer;
+}
+.tt-mini-btn:hover { background: var(--rpl-navy-50); }
+.tt-roster {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 2px;
+}
+.tt-roster-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid var(--rpl-border);
+  border-radius: var(--r-md);
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.tt-roster-mark {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+.tt-roster-item.is-absent { background: #fff; }
+.tt-roster-item.is-absent .tt-roster-mark { background: var(--rpl-absent); }
+.tt-roster-item.is-present { background: var(--tint-present-bg, #e8f5ef); border-color: #b9e0cd; }
+.tt-roster-item.is-present .tt-roster-mark { background: var(--rpl-present); }
+.tt-roster-roll {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--rpl-muted);
+  flex: 0 0 auto;
+}
+.tt-roster-name {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--rpl-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 @media (max-width: 560px) {
   .tt-log-row { grid-template-columns: 1fr 1fr; }
   .tt-log-pct { grid-column: 1 / -1; }

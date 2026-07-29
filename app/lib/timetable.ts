@@ -103,7 +103,10 @@ export const FACULTY_LIST = [
 ]
 export const DEPARTMENTS = ['Commerce & Management', 'Computer Applications', 'Science']
 export const COURSES = ['BBA', 'BCA', 'B.Com', 'MBA']
-export const SEMESTERS = ['Sem I', 'Sem II', 'Sem III', 'Sem IV', 'Sem V', 'Sem VI']
+// Class is identified by Course + Year + Section. The DB column is still named
+// `semester` but holds the year value (e.g. "2nd Year").
+export const YEARS = ['1st Year', '2nd Year', '3rd Year']
+export const SEMESTERS = YEARS // back-compat alias
 export const SECTIONS = ['A', 'B', 'C']
 export const BUILDINGS = ['Main Building', 'IT Block']
 export const ROOMS = ['Room 108', 'Room 205', 'Room 210', 'Lab 1', 'Lab 2']

@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'hono/jsx'
 import Icon from '../components/Icon'
+import { COURSES, YEARS, SECTIONS } from '../lib/timetable'
 
-type NewStudent = { rollNo: string; name: string; course: string; semester: string; section: string }
+// Class identity = Course + Year + Section. The Excel is course-wise, so Course
+// is chosen at upload; each row carries Section + Year (with a shared fallback).
+
+type NewStudent = { rollNo: string; name: string; year: string; section: string }
 type Student = { id: string; roll_no: string | null; name: string; course: string | null; semester: string | null; section: string | null }
 type ClassRow = { course: string | null; semester: string | null; section: string | null; n: number }
 
@@ -25,7 +29,6 @@ function parseCsvLine(line: string): string[] {
   return out
 }
 
-// Find a header index by any of the given aliases.
 function col(headers: string[], ...aliases: string[]) {
   for (const a of aliases) {
     const i = headers.findIndex((h) => h === a || h.includes(a))
@@ -39,13 +42,12 @@ function parseCsv(text: string): { rows: NewStudent[]; error?: string } {
   if (!lines.length) return { rows: [], error: 'File khaali hai.' }
   const headers = parseCsvLine(lines[0]).map((h) => h.trim().toLowerCase())
 
-  const rollI = col(headers, 'roll', 'enroll', 'roll no', 'rollno')
+  const rollI = col(headers, 'roll', 'enroll', 'rollno')
   const nameI = col(headers, 'name', 'student')
-  const courseI = col(headers, 'course', 'program', 'class')
-  const semI = col(headers, 'semester', 'sem')
+  const yearI = col(headers, 'year')
   const secI = col(headers, 'section', 'sec')
 
-  if (nameI === -1) return { rows: [], error: 'Koi "Name" column nahi mila. Header row me Name / Roll No / Course / Semester / Section hone chahiye.' }
+  if (nameI === -1) return { rows: [], error: 'Koi "Name" column nahi mila. Header row me kam se kam Name hona chahiye (Roll No, Section, Year optional).' }
 
   const rows: NewStudent[] = []
   for (let i = 1; i < lines.length; i++) {
@@ -55,8 +57,7 @@ function parseCsv(text: string): { rows: NewStudent[]; error?: string } {
     rows.push({
       rollNo: rollI >= 0 ? (c[rollI] ?? '').trim() : '',
       name,
-      course: courseI >= 0 ? (c[courseI] ?? '').trim() : '',
-      semester: semI >= 0 ? (c[semI] ?? '').trim() : '',
+      year: yearI >= 0 ? (c[yearI] ?? '').trim() : '',
       section: secI >= 0 ? (c[secI] ?? '').trim() : '',
     })
   }
@@ -69,10 +70,11 @@ export default function StudentsAdmin() {
   const [parseErr, setParseErr] = useState('')
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
-  // shared class fields when the file has no class columns
-  const [course, setCourse] = useState('')
-  const [semester, setSemester] = useState('')
-  const [section, setSection] = useState('')
+  // Course is always chosen at upload (file is course-wise). Year/Section act as
+  // a fallback for rows that don't carry them.
+  const [course, setCourse] = useState(COURSES[0])
+  const [year, setYear] = useState(YEARS[1])
+  const [section, setSection] = useState('A')
 
   const [classes, setClasses] = useState<ClassRow[]>([])
   const [viewKey, setViewKey] = useState('')
@@ -99,21 +101,15 @@ export default function StudentsAdmin() {
     reader.readAsText(file)
   }
 
-  const missingClass = parsed.length > 0 && parsed.every((r) => !r.course && !r.semester && !r.section)
-
   const doImport = async () => {
     if (!parsed.length) return
-    if (missingClass && (!course || !semester || !section)) {
-      setMsg('File me class columns nahi hain — upar Course / Semester / Section chuno.')
-      return
-    }
     setBusy(true)
     setMsg('')
     const students = parsed.map((r) => ({
       rollNo: r.rollNo,
       name: r.name,
-      course: r.course || course,
-      semester: r.semester || semester,
+      course, // always the chosen course
+      semester: r.year || year, // year stored in the semester column
       section: r.section || section,
     }))
     try {
@@ -157,10 +153,25 @@ export default function StudentsAdmin() {
         </div>
         <div className="tt-students-body">
           <p className="tt-students-hint">
-            Excel me columns: <strong>Roll No, Name, Course, Semester, Section</strong>.
-            Excel ko <strong>Save As → CSV</strong> karke upload karo. Agar file me class columns nahi hain,
-            to neeche Course/Semester/Section chun lo — sabhi students usi class me add honge.
+            File course-wise hai — <strong>Course</strong> yahan chuno. Excel me columns:{' '}
+            <strong>Roll No, Name, Section, Year</strong>. Excel ko <strong>Save As → CSV</strong> karke upload karo.
+            Agar file me Section/Year na hon to neeche chuni hui values sab pe lag jayengi.
           </p>
+
+          <div className="tt-students-class">
+            <label className="tt-tb-field"><span>Course</span>
+              <select value={course} onChange={(e) => setCourse((e.target as HTMLSelectElement).value)}>
+                {COURSES.map((o) => <option key={o}>{o}</option>)}
+              </select></label>
+            <label className="tt-tb-field"><span>Year (fallback)</span>
+              <select value={year} onChange={(e) => setYear((e.target as HTMLSelectElement).value)}>
+                {YEARS.map((o) => <option key={o}>{o}</option>)}
+              </select></label>
+            <label className="tt-tb-field"><span>Section (fallback)</span>
+              <select value={section} onChange={(e) => setSection((e.target as HTMLSelectElement).value)}>
+                {SECTIONS.map((o) => <option key={o}>{o}</option>)}
+              </select></label>
+          </div>
 
           <div className="tt-students-controls">
             <label className="btn-primary tt-file-btn">
@@ -170,27 +181,16 @@ export default function StudentsAdmin() {
             {fileName && <span className="tt-file-name">{fileName} — {parsed.length} rows</span>}
           </div>
 
-          {missingClass && (
-            <div className="tt-students-class">
-              <label className="tt-tb-field"><span>Course</span>
-                <input value={course} placeholder="BBA" onInput={(e) => setCourse((e.target as HTMLInputElement).value)} /></label>
-              <label className="tt-tb-field"><span>Semester</span>
-                <input value={semester} placeholder="Sem III" onInput={(e) => setSemester((e.target as HTMLInputElement).value)} /></label>
-              <label className="tt-tb-field"><span>Section</span>
-                <input value={section} placeholder="A" onInput={(e) => setSection((e.target as HTMLInputElement).value)} /></label>
-            </div>
-          )}
-
           {parseErr && <div className="tt-flash is-error"><Icon name="alert" size={15} /> {parseErr}</div>}
 
           {parsed.length > 0 && (
             <>
               <div className="admin-table-wrap tt-preview">
                 <table className="admin-table">
-                  <thead><tr><th>Roll No</th><th>Name</th><th>Course</th><th>Sem</th><th>Sec</th></tr></thead>
+                  <thead><tr><th>Roll No</th><th>Name</th><th>Course</th><th>Year</th><th>Section</th></tr></thead>
                   <tbody>
                     {parsed.slice(0, 8).map((r, i) => (
-                      <tr key={i}><td>{r.rollNo || '—'}</td><td>{r.name}</td><td>{r.course || course || '—'}</td><td>{r.semester || semester || '—'}</td><td>{r.section || section || '—'}</td></tr>
+                      <tr key={i}><td>{r.rollNo || '—'}</td><td>{r.name}</td><td>{course}</td><td>{r.year || year}</td><td>{r.section || section}</td></tr>
                     ))}
                   </tbody>
                 </table>
