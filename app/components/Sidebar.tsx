@@ -60,6 +60,7 @@ const NAV: Record<Role, NavGroup[]> = {
         { key: 'tt-weekly', href: '/master/timetable/weekly', label: 'Weekly Timetable', icon: 'table' },
         { key: 'tt-calendar', href: '/master/timetable/calendar', label: 'Calendar View', icon: 'calendar' },
         { key: 'tt-manage', href: '/master/timetable/manage', label: 'Manage Timetable', icon: 'check-square' },
+        { key: 'tt-students', href: '/master/timetable/students', label: 'Students', icon: 'users' },
         { key: 'tt-subjects', href: '/master/timetable/subjects', label: 'Subjects', icon: 'book' },
         { key: 'tt-classrooms', href: '/master/timetable/classrooms', label: 'Classrooms', icon: 'building' },
       ],
