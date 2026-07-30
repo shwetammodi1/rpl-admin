@@ -5462,6 +5462,31 @@ textarea:focus-visible {
 .tt-chip-name button:hover { background: var(--rpl-absent); color: #fff; }
 
 /* Roster one-click attendance */
+.tt-roster-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tt-roster-searchbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.tt-roster-count { font-size: 12.5px; color: var(--rpl-muted); }
+.tt-roster-count strong { color: var(--rpl-present); }
+.tt-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--rpl-border);
+  border-radius: var(--r-md);
+  background: #fff;
+  color: var(--rpl-muted);
+  min-width: 200px;
+  flex: 1;
+  max-width: 300px;
+}
+.tt-search input { border: none; outline: none; font: inherit; font-size: 13px; color: var(--rpl-ink); width: 100%; background: transparent; }
 .tt-log-count {
   padding: 8px 10px;
   border: 1px solid var(--rpl-border);
