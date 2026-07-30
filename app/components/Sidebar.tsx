@@ -21,6 +21,7 @@ const NAV: Record<Role, NavGroup[]> = {
         { key: 'tt-dashboard', href: '/dashboard/timetable', label: 'Dashboard', icon: 'layout-grid' },
         { key: 'tt-weekly', href: '/dashboard/timetable/weekly', label: 'Weekly Timetable', icon: 'table' },
         { key: 'tt-calendar', href: '/dashboard/timetable/calendar', label: 'Calendar View', icon: 'calendar' },
+        { key: 'tt-log', href: '/dashboard/timetable/log', label: 'Lesson Log', icon: 'file-text' },
       ],
     },
   ],
@@ -42,6 +43,7 @@ const NAV: Record<Role, NavGroup[]> = {
       items: [
         { key: 'tt-weekly', href: '/hr/timetable/weekly', label: 'Weekly Timetable', icon: 'table' },
         { key: 'tt-calendar', href: '/hr/timetable/calendar', label: 'Calendar View', icon: 'calendar' },
+        { key: 'tt-log', href: '/hr/timetable/log', label: 'Lesson Log', icon: 'file-text' },
       ],
     },
   ],
@@ -61,6 +63,7 @@ const NAV: Record<Role, NavGroup[]> = {
         { key: 'tt-calendar', href: '/master/timetable/calendar', label: 'Calendar View', icon: 'calendar' },
         { key: 'tt-manage', href: '/master/timetable/manage', label: 'Manage Timetable', icon: 'check-square' },
         { key: 'tt-students', href: '/master/timetable/students', label: 'Students', icon: 'users' },
+        { key: 'tt-log', href: '/master/timetable/log', label: 'Lesson Log', icon: 'file-text' },
         { key: 'tt-subjects', href: '/master/timetable/subjects', label: 'Subjects', icon: 'book' },
         { key: 'tt-classrooms', href: '/master/timetable/classrooms', label: 'Classrooms', icon: 'building' },
       ],

@@ -5487,6 +5487,11 @@ textarea:focus-visible {
   max-width: 300px;
 }
 .tt-search input { border: none; outline: none; font: inherit; font-size: 13px; color: var(--rpl-ink); width: 100%; background: transparent; }
+.tt-td-dim { color: var(--rpl-off); font-weight: 400; }
+.tt-toolbar input[type='date'] {
+  padding: 7px 10px; border: 1px solid var(--rpl-border); border-radius: var(--r-md);
+  font: inherit; font-size: 13px; color: var(--rpl-ink); background: #fff;
+}
 .tt-log-count {
   padding: 8px 10px;
   border: 1px solid var(--rpl-border);
